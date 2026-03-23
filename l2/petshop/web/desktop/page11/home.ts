@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l2/petshop/web/desktop/page11/home.ts" enhancement="_blank" />
 import { LitElement, html } from '/_102020_/l2/core/lit.js';
 import { loadPetshopHome } from '/_102030_/l2/petshop/web/shared/home.js';
 import { formatPrice } from '/_102030_/l2/petshop/web/shared/homeFormatters.js';

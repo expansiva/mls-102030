@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l2/petshop/web/shared/home.defs.ts" enhancement="_blank" />
 export const skill = `
 # Petshop Home Page
 

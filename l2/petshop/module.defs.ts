@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l2/petshop/module.defs.ts" enhancement="_blank" />
 export const skill = {
   moduleId: 'petshop',
   purpose: 'Petshop client module with desktop and mobile page variations.',

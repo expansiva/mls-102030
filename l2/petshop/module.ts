@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l2/petshop/module.ts" enhancement="_blank" />
 export const moduleGenome = {
   page11: {
     device: 'desktop',

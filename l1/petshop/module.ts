@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l1/petshop/module.ts" enhancement="_blank" />
 export interface PetshopCatalogProduct {
   productId: string;
   name: string;

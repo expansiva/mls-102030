@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l1/petshop/layer_3_usecases/catalogUsecases.ts" enhancement="_blank" />
 import type {
   PetshopCatalogProduct,
   PetshopHomeLoadParams,
