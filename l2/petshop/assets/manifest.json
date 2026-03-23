@@ -1,0 +1,15 @@
+{
+  "name": "Collab Test Petshop",
+  "short_name": "Petshop",
+  "display": "standalone",
+  "start_url": "/petshop/index.html",
+  "background_color": "#fffdfa",
+  "theme_color": "#17324d",
+  "icons": [
+    {
+      "src": "/petshop/assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

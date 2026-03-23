@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Petshop">
+  <rect width="128" height="128" rx="28" fill="#17324d"/>
+  <circle cx="40" cy="46" r="12" fill="#fffdfa"/>
+  <circle cx="88" cy="46" r="12" fill="#fffdfa"/>
+  <circle cx="30" cy="76" r="10" fill="#fffdfa"/>
+  <circle cx="58" cy="92" r="12" fill="#fffdfa"/>
+  <circle cx="98" cy="76" r="10" fill="#fffdfa"/>
+</svg>
