@@ -7,8 +7,8 @@ import type {
   PetshopUpdateProductParams,
 } from '/_102030_/l1/petshop/module.js';
 import { getPetshopMockProducts } from '/_102030_/l2/petshop/shared/mock/adminMock.js';
-import { AuditLogService, StatusHistoryService } from '/_102021_/l1/mdm/layer_3_usecases/core/DataRecordService.js';
-import { AppError, type RequestContext } from '/_102021_/l1/server/layer_2_controllers/contracts.js';
+import { AuditLogService, StatusHistoryService } from '/_102034_/l1/mdm/layer_3_usecases/core/DataRecordService.js';
+import { AppError, type RequestContext } from '/_102034_/l1/server/layer_2_controllers/contracts.js';
 
 async function getPetshopProductRepository(ctx: RequestContext) {
   return ctx.data.moduleData.getTable<PetshopCatalogProduct>('petshopProduct');

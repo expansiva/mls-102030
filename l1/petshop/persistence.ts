@@ -1,5 +1,5 @@
 /// <mls fileReference="_102030_/l1/petshop/persistence.ts" enhancement="_blank" />
-import type { TableDefinition } from '/_102021_/l1/server/layer_1_external/persistence/contracts.js';
+import type { TableDefinition } from '/_102034_/l1/server/layer_1_external/persistence/contracts.js';
 
 export const tableDefinitions: TableDefinition[] = [
   {
