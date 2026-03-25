@@ -1,9 +1,23 @@
 /// <mls fileReference="_102030_/l2/petshop/web/desktop/page11/home.ts" enhancement="_blank" />
-import { LitElement, html } from '/_102020_/l2/core/lit.js';
+import { LitElement, html } from 'lit';
+import type { AuraInteractionMode, AuraNormalizedError } from '/_102029_/l2/contracts/bootstrap.js';
+import {
+  beginExpectedNavigationLoad,
+  bindExpectedNavigationLoad,
+  consumeExpectedNavigationLoad,
+  runBlockingUiAction,
+} from '/_102029_/l2/interactionRuntime.js';
 import { loadPetshopHome } from '/_102030_/l2/petshop/web/shared/home.js';
 import { formatPrice } from '/_102030_/l2/petshop/web/shared/homeFormatters.js';
 import { updatePetshopProduct } from '/_102030_/l2/petshop/web/shared/updateProduct.js';
 import type { PetshopCatalogProduct } from '/_102030_/l1/petshop/module.js';
+
+function traceLazy(event: string, details?: Record<string, unknown>) {
+  if (!window.isTraceLazy) {
+    return;
+  }
+  console.log('[traceLazy][petshop]', event, details ?? {});
+}
 
 type PetshopSection = 'catalog' | 'edit-products';
 
@@ -37,7 +51,7 @@ export class PetshopWebDesktopHomePage extends LitElement {
     super.connectedCallback();
     window.addEventListener('popstate', this.handlePopState);
     this.currentSection = parseSection(window.location);
-    void this.loadHome();
+    void this.handleRouteChange();
   }
 
   disconnectedCallback() {
@@ -47,19 +61,58 @@ export class PetshopWebDesktopHomePage extends LitElement {
 
   private readonly handlePopState = () => {
     this.currentSection = parseSection(window.location);
-    void this.loadHome();
+    void this.handleRouteChange();
   };
 
-  private async loadHome(category?: string) {
+  private async handleRouteChange() {
+    this.currentSection = parseSection(window.location);
+    traceLazy('handleRouteChange', {
+      pathname: window.location.pathname,
+    });
+    const pendingLoad = consumeExpectedNavigationLoad();
+    const task = this.loadHome(undefined, {
+      mode: pendingLoad ? 'blocking' : 'silent',
+      signal: pendingLoad?.signal,
+    });
+    bindExpectedNavigationLoad(pendingLoad, task);
+    await task.catch(() => undefined);
+  }
+
+  private async navigateWithinModule(href: string, section: PetshopSection, signal?: AbortSignal) {
+    const pendingLoad = beginExpectedNavigationLoad(signal);
+    window.history.pushState({}, '', href);
+    this.currentSection = section;
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    await pendingLoad;
+  }
+
+  private async loadHome(category?: string, options: {
+    mode?: AuraInteractionMode;
+    signal?: AbortSignal;
+  } = {}) {
+    traceLazy('loadHome.start', {
+      pathname: window.location.pathname,
+      category: category ?? null,
+      mode: options.mode ?? 'silent',
+    });
     this.currentSection = parseSection(window.location);
     this.status = category ? `Filtering by ${category}...` : 'Loading catalog...';
     const response = await loadPetshopHome({
       category,
       topLimit: 3,
       forceSeed: false,
+    }, {
+      mode: options.mode,
+      signal: options.signal,
     });
 
     if (!response.ok || !response.data) {
+      if (options.mode === 'blocking') {
+        throw (response.error ?? {
+          code: 'UNEXPECTED_ERROR',
+          message: 'Could not load petshop data.',
+        }) satisfies AuraNormalizedError;
+      }
       this.status = 'Could not load petshop data.';
       this.items = [];
       this.topItems = [];
@@ -69,14 +122,26 @@ export class PetshopWebDesktopHomePage extends LitElement {
     this.items = response.data.catalog ?? [];
     this.topItems = response.data.topProducts ?? [];
     this.status = `${this.items.length} products available`;
+    traceLazy('loadHome.success', {
+      count: this.items.length,
+    });
   }
 
   private handleSectionClick(event: Event, section: PetshopSection) {
     event.preventDefault();
     const href = section === 'catalog' ? '/petshop' : '/petshop/edit-products';
-    window.history.pushState({}, '', href);
-    this.currentSection = section;
-    void this.loadHome();
+    const retry = () => this.navigateWithinModule(href, section);
+    void runBlockingUiAction(
+      async (signal) => {
+        await this.navigateWithinModule(href, section, signal);
+      },
+      {
+        clearContentWhileBusy: true,
+        busyLabel: 'Carregando pagina...',
+        errorTitle: 'Nao foi possivel carregar esta pagina',
+        retry,
+      },
+    );
   }
 
   private async handleEditorSubmit(event: SubmitEvent) {
@@ -84,8 +149,7 @@ export class PetshopWebDesktopHomePage extends LitElement {
     const form = event.currentTarget as HTMLFormElement;
     const formData = new FormData(form);
     const productId = String(formData.get('productId') ?? '');
-    this.status = `Saving ${productId}...`;
-    const response = await updatePetshopProduct({
+    const payload = {
       productId,
       author: this.editorAuthor.trim(),
       name: String(formData.get('name') ?? ''),
@@ -94,24 +158,70 @@ export class PetshopWebDesktopHomePage extends LitElement {
       highlightScore: Number(formData.get('highlightScore') ?? 0),
       stockStatus: String(formData.get('stockStatus') ?? 'in_stock') as PetshopCatalogProduct['stockStatus'],
       description: String(formData.get('description') ?? ''),
+    };
+    const retry = () => this.retryUpdateProduct(payload);
+    void runBlockingUiAction(
+      async (signal) => {
+        await this.saveProduct(payload, signal);
+      },
+      {
+        busyLabel: `Salvando ${productId}...`,
+        errorTitle: 'Nao foi possivel salvar o produto',
+        retry,
+      },
+    );
+  }
+
+  private async retryUpdateProduct(params: {
+    productId: string;
+    author: string;
+    name: string;
+    category: string;
+    priceInCents: number;
+    highlightScore: number;
+    stockStatus: PetshopCatalogProduct['stockStatus'];
+    description: string;
+  }) {
+    await this.saveProduct(params);
+  }
+
+  private async saveProduct(params: {
+    productId: string;
+    author: string;
+    name: string;
+    category: string;
+    priceInCents: number;
+    highlightScore: number;
+    stockStatus: PetshopCatalogProduct['stockStatus'];
+    description: string;
+  }, signal?: AbortSignal) {
+    this.status = `Saving ${params.productId}...`;
+    const response = await updatePetshopProduct(params, {
+      mode: 'blocking',
+      signal,
     });
 
     if (!response.ok || !response.data) {
-      this.status = response.error?.message ?? 'Could not update product.';
-      return;
+      throw (response.error ?? {
+        code: 'UNEXPECTED_ERROR',
+        message: 'Could not update product.',
+      }) satisfies AuraNormalizedError;
     }
 
     this.status = `Updated ${response.data.name} by ${this.editorAuthor.trim() || 'system'}.`;
-    await this.loadHome();
+    await this.loadHome(undefined, {
+      mode: 'blocking',
+      signal,
+    });
   }
 
   private renderCatalog() {
     return html`
       <div class="mb-6 grid gap-4 md:grid-cols-4">
-        <button class="rounded-full bg-aura-navy px-4 py-3 text-sm font-medium text-white transition hover:bg-aura-blue" @click="${() => this.loadHome()}">Reload</button>
-        <button class="rounded-full bg-aura-navy px-4 py-3 text-sm font-medium text-white transition hover:bg-aura-blue" @click="${() => this.loadHome('Banho')}">Banho</button>
-        <button class="rounded-full bg-aura-navy px-4 py-3 text-sm font-medium text-white transition hover:bg-aura-blue" @click="${() => this.loadHome('Alimentacao')}">Alimentacao</button>
-        <button class="rounded-full bg-aura-navy px-4 py-3 text-sm font-medium text-white transition hover:bg-aura-blue" @click="${() => this.loadHome('Higiene')}">Higiene</button>
+        <button class="rounded-full bg-aura-navy px-4 py-3 text-sm font-medium text-white transition hover:bg-aura-blue" @click="${() => void runBlockingUiAction((signal) => this.loadHome(undefined, { mode: 'blocking', signal }), { busyLabel: 'Atualizando catalogo...', errorTitle: 'Nao foi possivel atualizar o catalogo', retry: () => this.loadHome(undefined, { mode: 'blocking' }) })}">Reload</button>
+        <button class="rounded-full bg-aura-navy px-4 py-3 text-sm font-medium text-white transition hover:bg-aura-blue" @click="${() => void runBlockingUiAction((signal) => this.loadHome('Banho', { mode: 'blocking', signal }), { busyLabel: 'Filtrando catalogo...', errorTitle: 'Nao foi possivel aplicar o filtro', retry: () => this.loadHome('Banho', { mode: 'blocking' }) })}">Banho</button>
+        <button class="rounded-full bg-aura-navy px-4 py-3 text-sm font-medium text-white transition hover:bg-aura-blue" @click="${() => void runBlockingUiAction((signal) => this.loadHome('Alimentacao', { mode: 'blocking', signal }), { busyLabel: 'Filtrando catalogo...', errorTitle: 'Nao foi possivel aplicar o filtro', retry: () => this.loadHome('Alimentacao', { mode: 'blocking' }) })}">Alimentacao</button>
+        <button class="rounded-full bg-aura-navy px-4 py-3 text-sm font-medium text-white transition hover:bg-aura-blue" @click="${() => void runBlockingUiAction((signal) => this.loadHome('Higiene', { mode: 'blocking', signal }), { busyLabel: 'Filtrando catalogo...', errorTitle: 'Nao foi possivel aplicar o filtro', retry: () => this.loadHome('Higiene', { mode: 'blocking' }) })}">Higiene</button>
       </div>
 
       <div class="mb-10">
