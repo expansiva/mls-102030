@@ -13,7 +13,7 @@ import { updatePetshopProduct } from '/_102030_/l2/petshop/web/shared/updateProd
 import type { PetshopCatalogProduct } from '/_102030_/l1/petshop/module.js';
 
 function traceLazy(event: string, details?: Record<string, unknown>) {
-  if (!window.isTraceLazy) {
+  if (!(window as any).isTraceLazy) {
     return;
   }
   console.log('[traceLazy][petshop]', event, details ?? {});

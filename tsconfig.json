@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es2020",
+        "target": "es2022",
         "module": "nodenext",
         "types": ["node"],
         "esModuleInterop": true,
@@ -14,21 +14,26 @@
         "sourceMap": false,
         "declaration": false,
         "experimentalDecorators": true,
+        "useDefineForClassFields": false,
         "emitDecoratorMetadata": false,
         "noImplicitAny": false,
         "strictNullChecks": false,
+        "checkJs": false,
         "paths": {
             "/_102030_/*": [
                 "./*"
             ],
             "/_102029_/*": [
-                "./node_modules/mls-102029/*"
+                "./node_modules/mls-102029/*",
+                "../_102029_/dist/*"
             ],
             "/_102033_/*": [
-                "./node_modules/mls-102033/*"
+                "./node_modules/mls-102033/*",
+                "../_102033_/dist/*"
             ],
             "/_102034_/*": [
-                "./node_modules/mls-102034/*"
+                "./node_modules/mls-102034/*",
+                "../_102034_/dist/*"
             ]
         },
         "lib": [
@@ -39,9 +44,7 @@
     },
     "include": [
         "./l2/**/*",
-        "./l1/**/*",
-        "monaco.d.ts",
-        "mls.d.ts"
+        "./l1/**/*"
     ],
     "exclude": [
         "node_modules",
