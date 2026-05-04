@@ -1,0 +1,104 @@
+{
+  "defaultProjectId": "102030",
+  "shellTemplates": {
+    "spa": "./_102033_/l2/shared/spa/index.html",
+    "pwa": "./_102033_/l2/shared/pwa/index.html"
+  },
+  "publication": {
+    "defaultTarget": "local",
+    "targets": {
+      "local": {
+        "assetBaseUrl": "",
+        "serveStaticFromServer": true,
+        "minify": false,
+        "sourcemap": true
+      },
+      "cdncloudflare": {
+        "assetBaseUrl": "https://cdn.example.com",
+        "serveStaticFromServer": false,
+        "minify": true,
+        "sourcemap": false
+      }
+    }
+  },
+  "workspaceDependencies": {
+    "102029": {
+      "repo": "https://github.com/expansiva/mls-102029.git",
+      "commit": "df672f8fefc28293a9beab9a320604ecd841b5a6"
+    },
+    "102033": {
+      "repo": "https://github.com/expansiva/mls-102033.git",
+      "commit": "33134618aeff3c5d26be74d448d8fdffd083436e"
+    },
+    "102034": {
+      "repo": "https://github.com/expansiva/mls-102034.git",
+      "commit": "752302fa5a64619d73b4492356f57682736d0820"
+    }
+  },
+  "projects": {
+    "102030": {
+      "root": ".",
+      "type": "client",
+      "persistenceModules": [
+        {
+          "moduleId": "petshop",
+          "persistenceEntrypoint": "./_102030_/l1/petshop/persistence.js"
+        }
+      ],
+      "modules": [
+        {
+          "moduleId": "petshop",
+          "basePath": "/petshop",
+          "shellMode": "spa",
+          "backendRouter": "./_102030_/l1/petshop/layer_2_controllers/router.js"
+        }
+      ]
+    },
+    "102033": {
+      "root": "./_102033_",
+      "type": "master frontend"
+    },
+    "102034": {
+      "root": "./_102034_",
+      "type": "master backend",
+      "modules": [
+        {
+          "moduleId": "mdm",
+          "basePath": "/mdm",
+          "shellMode": "spa",
+          "backendRouter": "./_102034_/l1/mdm/layer_2_controllers/router.js"
+        },
+        {
+          "moduleId": "monitor",
+          "basePath": "/monitor",
+          "shellMode": "spa",
+          "backendRouter": "./_102034_/l1/monitor/layer_2_controllers/router.js"
+        },
+        {
+          "moduleId": "audit",
+          "basePath": "/audit",
+          "shellMode": "spa",
+          "backendRouter": "./_102034_/l1/audit/layer_2_controllers/router.js"
+        }
+      ],
+      "persistenceModules": [
+        {
+          "moduleId": "platform",
+          "persistenceEntrypoint": "./_102034_/l1/server/persistence.js"
+        },
+        {
+          "moduleId": "mdm",
+          "persistenceEntrypoint": "./_102034_/l1/mdm/persistence.js"
+        },
+        {
+          "moduleId": "monitor",
+          "persistenceEntrypoint": "./_102034_/l1/monitor/persistence.js"
+        }
+      ]
+    },
+    "102029": {
+      "root": "./_102029_",
+      "type": "lib"
+    }
+  }
+}

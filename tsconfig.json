@@ -1,11 +1,13 @@
 {
     "compilerOptions": {
-        "target": "es2022",
-        "module": "nodenext",
+        "target": "ES2022",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "baseUrl": ".",
         "types": ["node"],
         "esModuleInterop": true,
         "rootDir": ".",
-        "outDir": "./dist/",
+        "outDir": "dist",
         "strict": true,
         "removeComments": false,
         "skipLibCheck": true,
@@ -19,22 +21,12 @@
         "noImplicitAny": false,
         "strictNullChecks": false,
         "checkJs": false,
+        "noEmit": true,
         "paths": {
-            "/_102030_/*": [
-                "./*"
-            ],
-            "/_102029_/*": [
-                "./node_modules/mls-102029/*",
-                "../_102029_/dist/*"
-            ],
-            "/_102033_/*": [
-                "./node_modules/mls-102033/*",
-                "../_102033_/dist/*"
-            ],
-            "/_102034_/*": [
-                "./node_modules/mls-102034/*",
-                "../_102034_/dist/*"
-            ]
+            "/_102030_/*": ["./*"],
+            "/_102029_/*": ["./_102029_/*"],
+            "/_102033_/*": ["./_102033_/*"],
+            "/_102034_/*": ["./_102034_/*"]
         },
         "lib": [
             "dom",

@@ -21,4 +21,9 @@ Temporary Items
 #
 /node_modules/
 /dist/
+/.tsconfig.workspace.*.json
+/_102029_/
+/_102033_/
+/_102034_/
 package-lock.json
+pnpm-lock.yaml
