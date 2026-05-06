@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "node scripts/sync_workspace_deps.mjs",
     "deps:sync": "node scripts/sync_workspace_deps.mjs",
-    "build": "node scripts/build_workspace.mjs",
+    "build": "node scripts/build_workspace.mjs; node scripts/after_build_workspace.mjs",
     "dev": "node scripts/build_workspace.mjs --watch-tsc",
     "start": "npm run start:dev",
     "start:dev": "APP_ENV=development node dist/local/_102034_/l1/server/layer_1_external/transport/http/startServer.js",
@@ -20,8 +20,10 @@
     "db:reset-local": "node dist/local/_102034_/l1/scripts/resetLocalDb.js",
     "worker:write-behind": "node dist/local/_102034_/l1/scripts/runWriteBehindWorker.js",
     "restore:from-dynamo": "node dist/local/_102034_/l1/scripts/restoreFromDynamo.js",
+    "after_build": "node scripts/after_build_workspace.mjs",
     "test": "npm run build && node --test $(find dist/local -name '*.test.js' | sort)",
-    "test:integration": "npm run build && RUN_INTEGRATION_TESTS=true node --test $(find dist/local -name '*.integration.test.js' | sort)"
+    "test:integration": "npm run build && RUN_INTEGRATION_TESTS=true node --test $(find dist/local -name '*.integration.test.js' | sort)",
+    "buildCI": "node -e \"require('mls-ci').runCI()\""
   },
   "author": "",
   "license": "ISC",
@@ -38,6 +40,10 @@
     "@types/pg": "^8.18.0",
     "esbuild": "^0.27.4",
     "tailwindcss": "^4.2.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "mls-ci": "git+https://github.com/expansiva/mls-ci.git",
+    "node-fetch": "^2.7.0",
+    "less": "^4.6.4",
+    "adm-zip": "0.5.16"
   }
 }

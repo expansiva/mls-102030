@@ -21,7 +21,7 @@ const ROOT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG_PATH = resolve(ROOT_DIR, 'config.json');
 const DIST_DIR = resolve(ROOT_DIR, 'dist');
 const LOCAL_DIST_DIR = resolve(DIST_DIR, 'local');
-const VALID_PROJECT_TYPES = new Set(['master frontend', 'master backend', 'client', 'lib']);
+const VALID_PROJECT_TYPES = new Set(['master frontend', 'master backend', 'client', 'lib', 'enhancement']);
 const PROJECT_IMPORT_PATTERN = /(?<prefix>\bfrom\s+["']|\bimport\s*\(\s*["'])(?<specifier>\/_\d+_\/(?:core|l1|l2)\/[^"']+)(?<suffix>["'](?:\s*\))?)/gu;
 const IMPORTMAP_PATTERN = /\s*<script\s+type=["']importmap["'][^>]*>.*?<\/script>\s*/gsu;
 const PROJECT_ASSET_URL_PATTERN = /(?<prefix>["'(=])(?<path>\/_\d+_\/(?:core|l1|l2)\/[^"')\s>]+)/gu;

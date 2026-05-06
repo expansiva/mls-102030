@@ -49,10 +49,13 @@ function syncDependency(projectId, dependency) {
     throw new Error(`workspaceDependencies.${projectId} must declare repo and commit.`);
   }
 
-  const projectPath = resolve(ROOT_DIR, projectConfig.root);
+  const isEnhancement = projectConfig.type === 'enhancement';
+  const projectPath = isEnhancement
+    ? resolve(ROOT_DIR, 'enhancement', projectConfig.root.replace(/^\.[\\/]/, ''))
+    : resolve(ROOT_DIR, projectConfig.root);
   if (!existsSync(projectPath)) {
     log(`Cloning ${projectId} from ${dependency.repo}`);
-    run('git', ['clone', dependency.repo, projectPath]);
+    run('git', ['clone', dependency.repo,   projectPath]);
   } else {
     ensureCleanWorktree(projectId, projectPath);
   }
