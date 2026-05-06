@@ -42,7 +42,7 @@ jobs:
         fi
 
     - name: Install dependencies
-      run: npm install
+      run: npm install --ignore-scripts
 
     - name: Compile CI
       run: npm run buildCI
