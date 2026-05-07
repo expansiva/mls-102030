@@ -7,6 +7,7 @@
     "postinstall": "node scripts/sync_workspace_deps.mjs",
     "deps:sync": "node scripts/sync_workspace_deps.mjs",
     "build": "node scripts/build_workspace.mjs; node scripts/after_build_workspace.mjs",
+    "migrate": "npm run build && node dist/local/_102034_/l1/scripts/migrate.js",
     "dev": "node scripts/build_workspace.mjs --watch-tsc",
     "start": "npm run start:dev",
     "start:dev": "APP_ENV=development node dist/local/_102034_/l1/server/layer_1_external/transport/http/startServer.js",
