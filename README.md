@@ -37,6 +37,31 @@ With this structure, a client project can focus on its own product logic while r
 - shared blocking/error UX inherited from the master frontend
 - publication-ready build outputs for local server and CDN-oriented delivery
 
+## Production database migration
+
+Use the single migration entrypoint for production setup:
+
+```sh
+pnpm run migrate:prod
+```
+
+`migrate` first validates the production configuration, then builds the workspace, ensures the configured PostgreSQL database exists, applies the generated PostgreSQL schema additively, validates AWS credentials, creates the registered DynamoDB tables, and records the schema snapshot log. It creates missing PostgreSQL tables, adds missing columns, and creates missing indexes without deleting existing rows.
+
+This migration mode is intentionally conservative. It does not rename columns, drop columns, drop tables, change existing column types, or backfill business data automatically. Those changes need explicit migration scripts.
+
+Runtime configuration is read from environment variables or `.env`:
+
+- `APP_ENV=production` selects the production table names.
+- `AWS_REGION` selects the DynamoDB region.
+- `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and optionally `AWS_SESSION_TOKEN` are used when the process is not already running with an AWS role/profile.
+- `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, and `PGPASSWORD` select the PostgreSQL target.
+
+For `APP_ENV=production`, these values must be explicit. If no `.env` is present and the required variables are not exported in the shell, `pnpm run migrate:prod` fails before build instead of falling back to local defaults.
+
+Use `.env.example` as the template for the required production variables.
+
+Production DynamoDB table names are declared by the generated persistence manifests, including MDM tables such as `mdm_documents`, `mdm_relationship`, `mdm_prospect_relationship`, `mdm_audit_log`, `mdm_tag`, `mdm_comment`, `mdm_attachment`, and `mdm_number_sequence`, plus module tables such as `platform_schema_snapshot_log` and `petshop_product_documents`.
+
 ## Role inside the collab.codes model
 
 This project is one piece of the four-project setup:

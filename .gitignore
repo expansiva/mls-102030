@@ -21,6 +21,7 @@ Temporary Items
 #
 /node_modules/
 /dist/
+.env
 /.tsconfig.workspace.*.json
 /_102029_/
 /_102033_/

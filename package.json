@@ -7,21 +7,18 @@
     "postinstall": "node scripts/sync_workspace_deps.mjs",
     "deps:sync": "node scripts/sync_workspace_deps.mjs",
     "build": "node scripts/build_workspace.mjs; node scripts/after_build_workspace.mjs",
-    "migrate": "npm run build && node dist/local/_102034_/l1/scripts/migrate.js",
-    "dev": "node scripts/build_workspace.mjs --watch-tsc",
-    "start": "npm run start:dev",
+    "after_build": "node scripts/after_build_workspace.mjs",
+
+    "migrate:dev": "APP_ENV=development node scripts/migrate.mjs",
+    "migrate:staging": "APP_ENV=staging node scripts/migrate.mjs",
+    "migrate:prod": "APP_ENV=production node scripts/migrate.mjs",
+
     "start:dev": "APP_ENV=development node dist/local/_102034_/l1/server/layer_1_external/transport/http/startServer.js",
     "start:staging": "APP_ENV=staging node dist/local/_102034_/l1/server/layer_1_external/transport/http/startServer.js",
     "start:prod": "APP_ENV=production node dist/local/_102034_/l1/server/layer_1_external/transport/http/startServer.js",
-    "setup:server": "node dist/local/_102034_/l1/scripts/setupServer.js",
-    "dynamo:ensure-table": "node dist/local/_102034_/l1/scripts/ensureDynamoTable.js",
-    "db:init": "node dist/local/_102034_/l1/scripts/dbInit.js",
-    "db:migrate": "node dist/local/_102034_/l1/scripts/migrate.js",
-    "db:delete": "node dist/local/_102034_/l1/scripts/dbDelete.js",
-    "db:reset-local": "node dist/local/_102034_/l1/scripts/resetLocalDb.js",
+
     "worker:write-behind": "node dist/local/_102034_/l1/scripts/runWriteBehindWorker.js",
     "restore:from-dynamo": "node dist/local/_102034_/l1/scripts/restoreFromDynamo.js",
-    "after_build": "node scripts/after_build_workspace.mjs",
     "test": "npm run build && node --test $(find dist/local -name '*.test.js' | sort)",
     "test:integration": "npm run build && RUN_INTEGRATION_TESTS=true node --test $(find dist/local -name '*.integration.test.js' | sort)",
     "buildCI": "node -e \"require('mls-ci').runCI()\""
