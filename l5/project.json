@@ -1,22 +1,39 @@
 {
-  "orgName": "expansiva",
-  "designSystems": [
-    {
-      "dsIndex": "0",
-      "dsName": "localDesignSystem",
-      "widgetIOName": "_100554_configDsDefault"
-    }
-  ],
-  "languages": [
-    {
-      "language": "en",
-      "name": "English",
-      "path": "/"
-    }
-  ],
-  "plugins": {},
-  "reasons": {},
-  "services": [],
-  "links": [],
-  "servicesConfigEnabled": false
+  "schemaVersion": "2026-06-06",
+  "artifactType": "project",
+  "artifactId": "project",
+  "moduleName": "petShopStripe",
+  "status": "draft",
+  "source": {
+    "agentName": "agentFinalizeSolutionPlan",
+    "stepId": 11,
+    "planId": "plan-finalize-solution-plan"
+  },
+  "data": {
+    "schemaVersion": "2026-06-06",
+    "modules": [
+      {
+        "moduleName": "petShopStripe",
+        "module": {
+          "moduleName": "petShopStripe",
+          "purpose": "Criar um site de pet shop no Brasil com vendas de produtos e serviços, checkout e pagamentos via Stripe, além de gestão administrativa e financeiro.",
+          "businessDomain": "petShopCommerce",
+          "languages": [
+            "pt-BR"
+          ],
+          "visualStyle": {
+            "tone": "Moderno e amigável",
+            "layout": "Vitrine clara com navegação simples e foco em conversão",
+            "palette": [
+              "#F6F3FF",
+              "#8BC7B5",
+              "#F5A6C6",
+              "#FFD48A",
+              "#4C6A92"
+            ]
+          }
+        }
+      }
+    ]
+  }
 }

@@ -1,0 +1,317 @@
+{
+  "savedAt": "2026-06-08T12:25:54.346Z",
+  "agentName": "agentPlanWorkflowIndex",
+  "stepId": 20,
+  "planning": {
+    "planId": "plan-workflow-index",
+    "dependsOn": [
+      "plan-usecase-entities"
+    ],
+    "executionMode": "sequential",
+    "executionHost": "client"
+  },
+  "status": "waiting_after_prompt",
+  "payload": {
+    "type": "flexible",
+    "result": {
+      "toolName": "submitWorkflowIndex",
+      "arguments": {
+        "status": "ok",
+        "result": {
+          "workflows": [
+            {
+              "workflowId": "checkoutAndPayment",
+              "title": "Checkout e pagamento",
+              "purpose": "Fluxo de compra do cliente desde o carrinho até a confirmação de pagamento via Stripe, incluindo criação do pedido e atualização de métricas.",
+              "executionMode": "taskWorkflow",
+              "createsTask": false,
+              "actors": [
+                "cliente"
+              ],
+              "relatedCapabilities": [
+                "manageCartCheckout",
+                "payWithStripe"
+              ],
+              "relatedEntities": [
+                "Cart",
+                "CartItem",
+                "Order",
+                "OrderItem",
+                "Payment",
+                "StripeTransaction"
+              ],
+              "rulesApplied": [
+                "ruleOrderRequiresCustomer",
+                "ruleOrderStatusLifecycle",
+                "rulePaymentRequiredToConfirmOrder",
+                "ruleStripeTransactionLink",
+                "ruleMetricsUpdateOnOrderPaid"
+              ],
+              "persistenceRefs": [
+                "cart",
+                "order"
+              ],
+              "usecaseRefs": [
+                "usecaseCreateOrder",
+                "usecaseConfirmStripePayment",
+                "usecaseUpdateMetricsOnOrderPaid"
+              ],
+              "metricRefs": [
+                "salesOpsMetrics"
+              ],
+              "priority": "now",
+              "implementationSuggestions": [
+                {
+                  "suggestionId": "suggestStripeWebhookHandler",
+                  "title": "Processar confirmações de pagamento via webhook Stripe de forma assíncrona",
+                  "reason": "Garantir idempotência e confiabilidade na transição de status do pedido",
+                  "priority": "now"
+                },
+                {
+                  "suggestionId": "suggestCartExpirationJob",
+                  "title": "Expirar carrinhos abandonados automaticamente após período de inatividade",
+                  "reason": "Manter consistência de estoque e evitar carrinhos obsoletos",
+                  "priority": "soon"
+                }
+              ]
+            },
+            {
+              "workflowId": "serviceBooking",
+              "title": "Agendamento de serviço",
+              "purpose": "Permitir ao cliente selecionar data e horário disponíveis para serviços como banho e tosa, vinculando o agendamento ao pedido e gerando entrada na agenda administrativa.",
+              "executionMode": "taskWorkflow",
+              "createsTask": true,
+              "actors": [
+                "cliente",
+                "adminPetShop"
+              ],
+              "relatedCapabilities": [
+                "bookService"
+              ],
+              "relatedEntities": [
+                "ServiceBooking",
+                "Service",
+                "Pet",
+                "Order"
+              ],
+              "rulesApplied": [
+                "ruleServiceBookingRequiresSlot"
+              ],
+              "persistenceRefs": [
+                "serviceBooking",
+                "order"
+              ],
+              "usecaseRefs": [
+                "usecaseScheduleService"
+              ],
+              "metricRefs": [
+                "salesOpsMetrics"
+              ],
+              "priority": "soon",
+              "implementationSuggestions": [
+                {
+                  "suggestionId": "suggestRealTimeSlotCheck",
+                  "title": "Verificar disponibilidade de horários em tempo real durante a seleção",
+                  "reason": "Prevenir double-booking e garantir regra de slot disponível",
+                  "priority": "now"
+                },
+                {
+                  "suggestionId": "suggestBookingReminderNotification",
+                  "title": "Enviar lembrete automático de agendamento ao cliente",
+                  "reason": "Reduzir no-shows e melhorar ocupação da agenda",
+                  "priority": "soon"
+                }
+              ]
+            },
+            {
+              "workflowId": "orderLifecycleManagement",
+              "title": "Gestão do ciclo de vida do pedido",
+              "purpose": "Acompanhar e atualizar os status dos pedidos e serviços agendados, da criação até a separação, conclusão ou cancelamento, com atualização de métricas.",
+              "executionMode": "entityLifecycle",
+              "createsTask": true,
+              "actors": [
+                "adminPetShop"
+              ],
+              "relatedCapabilities": [
+                "manageOrdersServices"
+              ],
+              "relatedEntities": [
+                "Order",
+                "OrderItem",
+                "ServiceBooking"
+              ],
+              "rulesApplied": [
+                "ruleOrderStatusLifecycle",
+                "ruleMetricsUpdateOnOrderPaid"
+              ],
+              "persistenceRefs": [
+                "order",
+                "serviceBooking"
+              ],
+              "usecaseRefs": [
+                "usecaseUpdateOrderStatus"
+              ],
+              "metricRefs": [
+                "salesOpsMetrics"
+              ],
+              "priority": "now",
+              "implementationSuggestions": [
+                {
+                  "suggestionId": "suggestStatusTransitionValidation",
+                  "title": "Validar transições de status do pedido exclusivamente no backend",
+                  "reason": "Garantir integridade do ciclo de vida e evitar estados inválidos",
+                  "priority": "now"
+                },
+                {
+                  "suggestionId": "suggestServiceFulfillmentTask",
+                  "title": "Criar tarefa de cumprimento para serviços agendados na agenda da equipe",
+                  "reason": "Coordenar execução de banho/tosa e rastrear conclusão",
+                  "priority": "soon"
+                }
+              ]
+            },
+            {
+              "workflowId": "paymentReconciliation",
+              "title": "Conciliação de recebíveis",
+              "purpose": "Registrar recebíveis a partir de pagamentos aprovados e conciliar transações Stripe com lançamentos financeiros do pet shop.",
+              "executionMode": "taskWorkflow",
+              "createsTask": true,
+              "actors": [
+                "adminPetShop"
+              ],
+              "relatedCapabilities": [
+                "financialOverview"
+              ],
+              "relatedEntities": [
+                "Payment",
+                "StripeTransaction",
+                "Receivable",
+                "FinancialEntry",
+                "Order"
+              ],
+              "rulesApplied": [
+                "ruleReceivableFromPayment",
+                "ruleStripeTransactionLink"
+              ],
+              "persistenceRefs": [
+                "order"
+              ],
+              "usecaseRefs": [
+                "usecaseReconcilePayments"
+              ],
+              "metricRefs": [
+                "salesOpsMetrics"
+              ],
+              "priority": "soon",
+              "implementationSuggestions": [
+                {
+                  "suggestionId": "suggestStripePayoutAutoSync",
+                  "title": "Sincronizar payouts e extratos Stripe automaticamente",
+                  "reason": "Manter recebíveis atualizados sem intervenção manual",
+                  "priority": "soon"
+                },
+                {
+                  "suggestionId": "suggestReconciliationPendingAlert",
+                  "title": "Alertar administrador sobre transações pendentes de conciliação",
+                  "reason": "Evitar atraso no fechamento financeiro e garantir rastreabilidade",
+                  "priority": "soon"
+                }
+              ]
+            },
+            {
+              "workflowId": "catalogManagement",
+              "title": "Gestão de catálogo",
+              "purpose": "Fluxo administrativo para criação, edição, ativação e desativação de produtos, serviços e categorias no catálogo do pet shop.",
+              "executionMode": "entityLifecycle",
+              "createsTask": false,
+              "actors": [
+                "adminPetShop"
+              ],
+              "relatedCapabilities": [
+                "manageCatalog"
+              ],
+              "relatedEntities": [
+                "Product",
+                "Service",
+                "CatalogCategory"
+              ],
+              "rulesApplied": [],
+              "persistenceRefs": [],
+              "usecaseRefs": [
+                "usecaseManageCatalog"
+              ],
+              "metricRefs": [],
+              "priority": "now",
+              "implementationSuggestions": [
+                {
+                  "suggestionId": "suggestCatalogAuditLog",
+                  "title": "Manter histórico de alterações de preço e disponibilidade do catálogo",
+                  "reason": "Auditar mudanças e facilitar rollback",
+                  "priority": "soon"
+                },
+                {
+                  "suggestionId": "suggestBulkCatalogEdit",
+                  "title": "Suportar edição em lote de produtos e serviços",
+                  "reason": "Agilizar atualizações sazonais e promoções",
+                  "priority": "later"
+                }
+              ]
+            },
+            {
+              "workflowId": "abandonedCartCleanup",
+              "title": "Limpeza de carrinhos abandonados",
+              "purpose": "Expirar automaticamente carrinhos inativos após período definido, liberando recursos e mantendo a base limpa.",
+              "executionMode": "automation",
+              "createsTask": false,
+              "actors": [
+                "adminPetShop"
+              ],
+              "relatedCapabilities": [
+                "manageCartCheckout"
+              ],
+              "relatedEntities": [
+                "Cart"
+              ],
+              "rulesApplied": [],
+              "persistenceRefs": [
+                "cart"
+              ],
+              "usecaseRefs": [],
+              "metricRefs": [],
+              "priority": "soon",
+              "implementationSuggestions": [
+                {
+                  "suggestionId": "suggestCartRecoveryEmail",
+                  "title": "Enviar e-mail de recuperação de carrinho abandonado antes da expiração",
+                  "reason": "Recuperar vendas perdidas e melhorar conversão",
+                  "priority": "soon"
+                },
+                {
+                  "suggestionId": "suggestCartCleanupSchedule",
+                  "title": "Executar rotina de limpeza diariamente em horário de baixa demanda",
+                  "reason": "Minimizar impacto na performance do banco",
+                  "priority": "now"
+                }
+              ]
+            }
+          ]
+        },
+        "questions": [
+          "O agendamento deve permitir múltiplos pets por reserva ou sempre um único pet?",
+          "Deseja armazenar métricas agregadas separadas por janela (hora/dia/semana/mês) em tabelas adicionais ou manter apenas o time series bruto com agregações sob consulta?"
+        ],
+        "trace": [
+          "Mapeados 6 workflows a partir das capacidades e artefatos aprovados: checkout, agendamento, ciclo de vida do pedido, conciliação financeira, gestão de catálogo e automação de limpeza de carrinhos.",
+          "Definidos modos de execução conforme natureza: taskWorkflow para processos multi-etapa do cliente e admin, entityLifecycle para pedidos e catálogo, automation para expiração de carrinhos.",
+          "Vinculadas tabelas module-owned em persistenceRefs (cart, order, serviceBooking) e excluídas tabelas MDM, horizontal e plugin.",
+          "Referenciados casos de uso da camada 3 e tabela de métricas salesOpsMetrics nos workflows que alimentam ou dependem de métricas.",
+          "Incluídas sugestões de implementação para webhooks Stripe, validação de transições de status, conciliação automática e recuperação de carrinhos abandonados."
+        ]
+      }
+    },
+    "status": "completed",
+    "stepId": 59,
+    "interaction": null,
+    "nextSteps": null
+  }
+}

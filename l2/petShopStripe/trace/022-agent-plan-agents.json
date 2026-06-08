@@ -1,0 +1,36 @@
+{
+  "savedAt": "2026-06-08T12:33:39.618Z",
+  "agentName": "agentPlanAgents",
+  "stepId": 22,
+  "planning": {
+    "planId": "plan-agents",
+    "dependsOn": [
+      "plan-plugins",
+      "plan-usecase-entities",
+      "plan-workflow-definition"
+    ],
+    "executionMode": "sequential",
+    "executionHost": "client"
+  },
+  "status": "waiting_after_prompt",
+  "payload": {
+    "type": "flexible",
+    "result": {
+      "toolName": "submitAgentPlan",
+      "arguments": {
+        "status": "ok",
+        "result": {
+          "agents": []
+        },
+        "questions": [],
+        "trace": [
+          "Nenhum agente operacional adicional necessário no escopo atual."
+        ]
+      }
+    },
+    "status": "completed",
+    "stepId": 78,
+    "interaction": null,
+    "nextSteps": null
+  }
+}

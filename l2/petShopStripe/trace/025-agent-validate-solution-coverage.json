@@ -1,0 +1,197 @@
+{
+  "savedAt": "2026-06-08T12:38:58.113Z",
+  "agentName": "agentValidateSolutionCoverage",
+  "stepId": 25,
+  "planning": {
+    "planId": "plan-validate-solution-coverage",
+    "dependsOn": [
+      "plan-mdm",
+      "plan-horizontals",
+      "plan-plugins",
+      "plan-persistence-index",
+      "plan-table-definition",
+      "plan-metrics-index",
+      "plan-metric-table-definition",
+      "plan-usecase-entities",
+      "plan-workflow-definition",
+      "plan-agents",
+      "plan-page-definition"
+    ],
+    "executionMode": "sequential",
+    "executionHost": "client"
+  },
+  "status": "waiting_after_prompt",
+  "payload": {
+    "type": "flexible",
+    "result": {
+      "toolName": "submitSolutionCoverageValidation",
+      "arguments": {
+        "status": "needs_input",
+        "result": {
+          "summary": {
+            "passed": false,
+            "errorCount": 13,
+            "warningCount": 1
+          },
+          "issues": [
+            {
+              "severity": "error",
+              "code": "usecase.nonModuleTables",
+              "message": "usecaseEntity catalogAggregate referencia tabelas MDM (product, service, catalogCategory) que não são moduleOwned nem existem no persistence index.",
+              "path": "usecaseEntitiesPlan.result.usecaseEntities[4].sourceTables",
+              "evidence": [
+                "sourceTables: product, service, catalogCategory",
+                "persistenceIndex excludes MDM entities"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "usecase.nonModuleTables",
+              "message": "usecaseEntity receivableAggregate referencia tabelas horizontais (receivable, financialEntry) fora do escopo moduleOwned.",
+              "path": "usecaseEntitiesPlan.result.usecaseEntities[5].sourceTables",
+              "evidence": [
+                "sourceTables: receivable, financialEntry",
+                "persistenceIndex excludes horizontal entities"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "usecase.nonModuleTables",
+              "message": "usecaseManageCatalog lê/escreve tabelas product/service/catalogCategory que não estão no persistence index do módulo.",
+              "path": "usecaseEntitiesPlan.result.usecases[12].readsTables",
+              "evidence": [
+                "readsTables: product, service, catalogCategory",
+                "writesTables: product, service, catalogCategory"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "usecase.nonModuleTables",
+              "message": "usecaseReconcilePayments acessa tabelas payment/stripeTransaction/receivable/financialEntry (horizontais/plugin) diretamente.",
+              "path": "usecaseEntitiesPlan.result.usecases[13].readsTables",
+              "evidence": [
+                "readsTables: order, payment, stripeTransaction",
+                "writesTables: receivable, financialEntry"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "workflow.indexMismatch",
+              "message": "workflow paymentReconciliation tem persistenceRefs diferentes entre índice e definição.",
+              "path": "workflowIndex.result.workflows[3].persistenceRefs",
+              "evidence": [
+                "index: [\"order\"]",
+                "definition: [\"order\",\"receivable\",\"financialEntry\"]"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "workflow.indexMismatch",
+              "message": "workflow catalogManagement tem persistenceRefs diferentes entre índice e definição.",
+              "path": "workflowIndex.result.workflows[4].persistenceRefs",
+              "evidence": [
+                "index: []",
+                "definition: [\"product\",\"service\",\"catalogCategory\"]"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "plugin.idMismatch",
+              "message": "ID do plugin Stripe inconsistente: plano de plugins usa pluginStripePagamentos, enquanto páginas/workflows referenciam stripePaymentsPlugin.",
+              "path": "pluginPlan.result.plugins[0].pluginId",
+              "evidence": [
+                "pluginId: pluginStripePagamentos",
+                "references: stripePaymentsPlugin"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "metricTable.idMismatch",
+              "message": "ID da tabela de métricas inconsistente: approvedArtifacts usa metricTableSalesOps, enquanto índices/defs usam salesOpsMetrics.",
+              "path": "finalPlan.result.approvedArtifacts.metricTables[0].signal",
+              "evidence": [
+                "approvedArtifacts: metricTableSalesOps",
+                "metricTables/index/defs: salesOpsMetrics"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "bff.missingUsecaseRefs",
+              "message": "BFF getCatalogHighlights não declara usecaseRefs.",
+              "path": "pageDefinitions.homePage.bffCommands[0].usecaseRefs",
+              "evidence": [
+                "usecaseRefs: []"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "bff.missingUsecaseRefs",
+              "message": "BFF getCatalogList não declara usecaseRefs.",
+              "path": "pageDefinitions.catalogPage.bffCommands[0].usecaseRefs",
+              "evidence": [
+                "usecaseRefs: []"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "bff.undefinedUsecase",
+              "message": "BFF getProductServiceDetail referencia usecaseViewProductService que não existe no plano de casos de uso.",
+              "path": "pageDefinitions.productServiceDetailPage.bffCommands[0].usecaseRefs",
+              "evidence": [
+                "usecaseRefs: [\"usecaseViewProductService\"]",
+                "usecasePlan does not define this id"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "bff.missingUsecaseRefs",
+              "message": "BFF getFinancialOverview não declara usecaseRefs apesar de ler tabela moduleOwned (order).",
+              "path": "pageDefinitions.adminFinancialPage.bffCommands[0].usecaseRefs",
+              "evidence": [
+                "readsTables: [\"order\"]",
+                "usecaseRefs: []"
+              ]
+            },
+            {
+              "severity": "error",
+              "code": "metrics.layer2WriteForbidden",
+              "message": "BFF confirmStripePayment declara writesTables incluindo salesOpsMetrics; métricas não podem ser atualizadas por layer_2.",
+              "path": "pageDefinitions.checkoutPage.bffCommands[2].writesTables",
+              "evidence": [
+                "writesTables: [\"order\",\"salesOpsMetrics\"]",
+                "metric update must be layer_3 only"
+              ]
+            },
+            {
+              "severity": "warning",
+              "code": "metricTable.missingRefs",
+              "message": "serviceBooking table marca feedsMetrics=true mas não lista metricRefs.",
+              "path": "tableDefinitions[2].result.tableDefinition.metricUpdatePolicy.metricRefs",
+              "evidence": [
+                "feedsMetrics: true",
+                "metricRefs: []"
+              ]
+            }
+          ],
+          "readyToSaveDefs": false
+        },
+        "questions": [
+          "Devemos criar um caso de uso específico para leitura de detalhe de produto/serviço (ex.: usecaseViewProductService) e qual deve ser o ID oficial?",
+          "Devemos criar um caso de uso para consulta financeira (ex.: usecaseGetFinancialOverview) para o BFF getFinancialOverview?",
+          "Qual é o identificador canônico do plugin Stripe e da tabela de métricas para alinhar referências (stripePaymentsPlugin vs pluginStripePagamentos; metricTableSalesOps vs salesOpsMetrics)?"
+        ],
+        "trace": [
+          "Validei MDM e presença de índices/tabelas métricas.",
+          "Chequei consistência entre persistence index, usecases e workflows.",
+          "Verifiquei regras de BFF (usecaseRefs obrigatórios, sem acesso direto a métricas).",
+          "Comparei IDs e referências cruzadas de plugins, métricas e workflows.",
+          "Revisei políticas de métricas e camadas de atualização."
+        ]
+      }
+    },
+    "status": "completed",
+    "stepId": 96,
+    "interaction": null,
+    "nextSteps": null
+  }
+}

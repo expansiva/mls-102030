@@ -1,0 +1,373 @@
+{
+  "savedAt": "2026-06-08T12:37:24.756Z",
+  "agentName": "agentPlanPageDefinition",
+  "stepId": 93,
+  "planning": null,
+  "status": "waiting_after_prompt",
+  "payload": {
+    "type": "flexible",
+    "result": {
+      "toolName": "submitPageDefinitionPlan",
+      "arguments": {
+        "status": "needs_input",
+        "result": {
+          "pageDefinition": {
+            "pageId": "adminFinancialPage",
+            "pageName": "Financeiro",
+            "actor": "adminPetShop",
+            "purpose": "Visualizar recebíveis, transações Stripe e conciliar pagamentos.",
+            "capabilities": [
+              "financialOverview"
+            ],
+            "flowRefs": {
+              "experienceFlows": [],
+              "entityLifecycles": [],
+              "taskWorkflows": [
+                "paymentReconciliation"
+              ],
+              "automations": []
+            },
+            "pluginRefs": [
+              "stripePaymentsPlugin"
+            ],
+            "mdmRefs": [
+              "organization"
+            ],
+            "pageInputs": [
+              {
+                "name": "periodStart",
+                "type": "date",
+                "required": false,
+                "sources": [
+                  "queryParam"
+                ],
+                "description": "Data inicial do período para filtro financeiro."
+              },
+              {
+                "name": "periodEnd",
+                "type": "date",
+                "required": false,
+                "sources": [
+                  "queryParam"
+                ],
+                "description": "Data final do período para filtro financeiro."
+              },
+              {
+                "name": "reconciliationStatus",
+                "type": "string",
+                "required": false,
+                "sources": [
+                  "queryParam"
+                ],
+                "description": "Status de conciliação para filtrar recebíveis e transações."
+              }
+            ],
+            "navigationRefs": [
+              {
+                "direction": "outbound",
+                "pageId": "adminDashboardPage",
+                "trigger": "Voltar ao dashboard",
+                "description": "Retornar ao painel administrativo."
+              }
+            ],
+            "sections": [
+              {
+                "sectionName": "Filtros financeiros",
+                "mode": "filter",
+                "organisms": [
+                  {
+                    "organismName": "financialFilters",
+                    "purpose": "Definir período e status de conciliação para a consulta.",
+                    "userActions": [
+                      "Aplicar filtros",
+                      "Limpar filtros"
+                    ],
+                    "requiredEntities": [],
+                    "readsFields": [],
+                    "writesFields": [],
+                    "rulesApplied": []
+                  }
+                ]
+              },
+              {
+                "sectionName": "Resumo financeiro",
+                "mode": "view",
+                "organisms": [
+                  {
+                    "organismName": "financialTotalsSummary",
+                    "purpose": "Exibir totais agregados de recebíveis e pagamentos.",
+                    "userActions": [
+                      "Visualizar totais"
+                    ],
+                    "requiredEntities": [
+                      "Receivable",
+                      "Payment",
+                      "StripeTransaction"
+                    ],
+                    "readsFields": [
+                      "amount",
+                      "status",
+                      "reconciledAt"
+                    ],
+                    "writesFields": [],
+                    "rulesApplied": []
+                  }
+                ]
+              },
+              {
+                "sectionName": "Recebíveis e lançamentos",
+                "mode": "view",
+                "organisms": [
+                  {
+                    "organismName": "receivablesList",
+                    "purpose": "Listar recebíveis vinculados a pedidos e pagamentos.",
+                    "userActions": [
+                      "Visualizar recebíveis",
+                      "Ordenar lista"
+                    ],
+                    "requiredEntities": [
+                      "Receivable",
+                      "Order",
+                      "Payment"
+                    ],
+                    "readsFields": [
+                      "receivableId",
+                      "orderId",
+                      "paymentId",
+                      "amount",
+                      "status",
+                      "dueDate",
+                      "reconciledAt"
+                    ],
+                    "writesFields": [],
+                    "rulesApplied": []
+                  },
+                  {
+                    "organismName": "financialEntriesList",
+                    "purpose": "Exibir lançamentos financeiros relacionados aos recebíveis.",
+                    "userActions": [
+                      "Visualizar lançamentos"
+                    ],
+                    "requiredEntities": [
+                      "FinancialEntry",
+                      "Receivable"
+                    ],
+                    "readsFields": [
+                      "financialEntryId",
+                      "receivableId",
+                      "entryType",
+                      "amount",
+                      "createdAt"
+                    ],
+                    "writesFields": [],
+                    "rulesApplied": []
+                  }
+                ]
+              },
+              {
+                "sectionName": "Transações Stripe e conciliação",
+                "mode": "action",
+                "organisms": [
+                  {
+                    "organismName": "stripeTransactionsSelection",
+                    "purpose": "Selecionar transações Stripe aprovadas para conciliação.",
+                    "userActions": [
+                      "Selecionar transações",
+                      "Ver detalhes da transação"
+                    ],
+                    "requiredEntities": [
+                      "StripeTransaction",
+                      "Payment",
+                      "Order"
+                    ],
+                    "readsFields": [
+                      "stripeTransactionId",
+                      "paymentId",
+                      "orderId",
+                      "amount",
+                      "status",
+                      "createdAt"
+                    ],
+                    "writesFields": [],
+                    "rulesApplied": []
+                  },
+                  {
+                    "organismName": "reconciliationActionPanel",
+                    "purpose": "Confirmar conciliação das transações selecionadas.",
+                    "userActions": [
+                      "Conciliar pagamentos"
+                    ],
+                    "requiredEntities": [
+                      "Receivable",
+                      "FinancialEntry",
+                      "Payment",
+                      "StripeTransaction"
+                    ],
+                    "readsFields": [
+                      "stripeTransactionId",
+                      "paymentId",
+                      "amount",
+                      "status"
+                    ],
+                    "writesFields": [
+                      "receivableId",
+                      "financialEntryId",
+                      "reconciledAt",
+                      "status"
+                    ],
+                    "rulesApplied": [
+                      "ruleReceivableFromPayment"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "bffCommands": [
+            {
+              "commandName": "getFinancialOverview",
+              "purpose": "Consultar recebíveis, transações e lançamentos financeiros conforme filtros.",
+              "kind": "query",
+              "input": {
+                "period": {
+                  "startDate": "date",
+                  "endDate": "date"
+                },
+                "reconciliationStatus": "string?",
+                "paymentStatus": "string?"
+              },
+              "output": {
+                "totals": {
+                  "grossAmount": "number",
+                  "netAmount": "number",
+                  "receivableCount": "number",
+                  "reconciledCount": "number"
+                },
+                "receivables": [
+                  {
+                    "receivableId": "string",
+                    "orderId": "string",
+                    "paymentId": "string",
+                    "amount": "number",
+                    "status": "string",
+                    "dueDate": "date",
+                    "reconciledAt": "date?"
+                  }
+                ],
+                "stripeTransactions": [
+                  {
+                    "stripeTransactionId": "string",
+                    "paymentId": "string",
+                    "orderId": "string",
+                    "amount": "number",
+                    "status": "string",
+                    "createdAt": "date"
+                  }
+                ],
+                "financialEntries": [
+                  {
+                    "financialEntryId": "string",
+                    "receivableId": "string",
+                    "entryType": "string",
+                    "amount": "number",
+                    "createdAt": "date"
+                  }
+                ]
+              },
+              "readsEntities": [
+                "Receivable",
+                "StripeTransaction",
+                "FinancialEntry",
+                "Payment",
+                "Order"
+              ],
+              "writesEntities": [],
+              "readsTables": [
+                "order"
+              ],
+              "writesTables": [],
+              "usecaseRefs": [],
+              "layerContract": {
+                "controllerLayer": "layer_2_controllers",
+                "mustCallLayer": "layer_3_usecases",
+                "directTableAccessForbidden": true
+              },
+              "rulesApplied": []
+            },
+            {
+              "commandName": "reconcilePayments",
+              "purpose": "Registrar conciliação de pagamentos aprovados e criar recebíveis e lançamentos.",
+              "kind": "command",
+              "input": {
+                "transactionIds": [
+                  "string"
+                ],
+                "confirm": "boolean",
+                "reconciliationNote": "string?"
+              },
+              "output": {
+                "reconciledReceivables": [
+                  {
+                    "receivableId": "string",
+                    "paymentId": "string",
+                    "status": "string",
+                    "reconciledAt": "date"
+                  }
+                ],
+                "financialEntries": [
+                  {
+                    "financialEntryId": "string",
+                    "receivableId": "string",
+                    "amount": "number",
+                    "entryType": "string"
+                  }
+                ],
+                "reconciliationSummary": {
+                  "reconciledCount": "number",
+                  "totalAmount": "number"
+                }
+              },
+              "readsEntities": [
+                "Payment",
+                "StripeTransaction",
+                "Order"
+              ],
+              "writesEntities": [
+                "Receivable",
+                "FinancialEntry",
+                "Payment"
+              ],
+              "readsTables": [
+                "order"
+              ],
+              "writesTables": [],
+              "usecaseRefs": [
+                "usecaseReconcilePayments"
+              ],
+              "layerContract": {
+                "controllerLayer": "layer_2_controllers",
+                "mustCallLayer": "layer_3_usecases",
+                "directTableAccessForbidden": true
+              },
+              "rulesApplied": [
+                "ruleReceivableFromPayment"
+              ]
+            }
+          ]
+        },
+        "questions": [
+          "Existe um caso de uso específico para consulta do financeiro (ex.: usecaseGetFinancialOverview) ou devemos reutilizar outro caso existente?"
+        ],
+        "trace": [
+          "Planejamento da página adminFinancialPage com foco em visão financeira e conciliação de pagamentos.",
+          "Comandos BFF derivados dos hints: getFinancialOverview (consulta) e reconcilePayments (conciliação).",
+          "Incluída seleção de transações antes da confirmação de conciliação conforme fluxo de trabalho paymentReconciliation."
+        ]
+      }
+    },
+    "status": "completed",
+    "stepId": 95,
+    "interaction": null,
+    "nextSteps": null
+  }
+}

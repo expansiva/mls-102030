@@ -1,0 +1,356 @@
+{
+  "savedAt": "2026-06-08T12:37:03.378Z",
+  "agentName": "agentPlanPageDefinition",
+  "stepId": 85,
+  "planning": null,
+  "status": "waiting_after_prompt",
+  "payload": {
+    "type": "flexible",
+    "result": {
+      "toolName": "submitPageDefinitionPlan",
+      "arguments": {
+        "status": "needs_input",
+        "result": {
+          "pageDefinition": {
+            "pageId": "productServiceDetailPage",
+            "pageName": "Detalhe de produto/serviço",
+            "actor": "cliente",
+            "purpose": "Exibir detalhes, preço e opções de compra ou agendamento do item selecionado.",
+            "capabilities": [
+              "browseCatalog",
+              "manageCartCheckout",
+              "bookService"
+            ],
+            "flowRefs": {
+              "experienceFlows": [],
+              "entityLifecycles": [],
+              "taskWorkflows": [
+                "serviceBooking"
+              ],
+              "automations": []
+            },
+            "pluginRefs": [],
+            "mdmRefs": [
+              "productService",
+              "customer"
+            ],
+            "pageInputs": [
+              {
+                "name": "itemId",
+                "type": "uuid",
+                "required": true,
+                "sources": [
+                  "routeParam"
+                ],
+                "description": "Identificador do produto ou serviço selecionado."
+              },
+              {
+                "name": "itemType",
+                "type": "string",
+                "required": true,
+                "sources": [
+                  "routeParam"
+                ],
+                "description": "Tipo do item selecionado (product ou service)."
+              },
+              {
+                "name": "petId",
+                "type": "uuid",
+                "required": false,
+                "sources": [
+                  "queryParam",
+                  "previousStepResult"
+                ],
+                "description": "Identificador do pet quando houver agendamento.",
+                "entityRef": "Pet"
+              }
+            ],
+            "navigationRefs": [
+              {
+                "direction": "inbound",
+                "pageId": "catalogPage",
+                "trigger": "Selecionar item"
+              },
+              {
+                "direction": "outbound",
+                "pageId": "cartPage",
+                "trigger": "Adicionar ao carrinho"
+              }
+            ],
+            "sections": [
+              {
+                "sectionName": "Detalhes do item",
+                "mode": "view",
+                "organisms": [
+                  {
+                    "organismName": "productServiceDetail",
+                    "purpose": "Apresentar descrição, preço, categoria e disponibilidade do produto ou serviço.",
+                    "userActions": [
+                      "Ver detalhes de produto/serviço"
+                    ],
+                    "requiredEntities": [
+                      "Product",
+                      "Service",
+                      "CatalogCategory"
+                    ],
+                    "readsFields": [
+                      "Product.productId",
+                      "Product.name",
+                      "Product.description",
+                      "Product.price",
+                      "Product.currency",
+                      "Product.availabilityStatus",
+                      "Service.serviceId",
+                      "Service.name",
+                      "Service.description",
+                      "Service.price",
+                      "Service.currency",
+                      "Service.availabilityStatus",
+                      "Service.duration",
+                      "CatalogCategory.categoryId",
+                      "CatalogCategory.name"
+                    ],
+                    "writesFields": [],
+                    "rulesApplied": []
+                  }
+                ]
+              },
+              {
+                "sectionName": "Ações de compra",
+                "mode": "create",
+                "organisms": [
+                  {
+                    "organismName": "addToCartForm",
+                    "purpose": "Selecionar quantidade e adicionar o item ao carrinho.",
+                    "userActions": [
+                      "Adicionar ao carrinho"
+                    ],
+                    "requiredEntities": [
+                      "Cart",
+                      "CartItem",
+                      "Product",
+                      "Service"
+                    ],
+                    "readsFields": [
+                      "Product.productId",
+                      "Product.price",
+                      "Service.serviceId",
+                      "Service.price"
+                    ],
+                    "writesFields": [
+                      "Cart.cartId",
+                      "Cart.itemsCount",
+                      "Cart.subtotalAmount",
+                      "Cart.discountAmount",
+                      "Cart.totalAmount",
+                      "CartItem.quantity"
+                    ],
+                    "rulesApplied": []
+                  }
+                ]
+              },
+              {
+                "sectionName": "Agendamento de serviço",
+                "mode": "create",
+                "organisms": [
+                  {
+                    "organismName": "serviceBookingForm",
+                    "purpose": "Selecionar data e horário para agendar um serviço quando aplicável.",
+                    "userActions": [
+                      "Agendar serviço"
+                    ],
+                    "requiredEntities": [
+                      "ServiceBooking",
+                      "Service",
+                      "Pet",
+                      "Order"
+                    ],
+                    "readsFields": [
+                      "Service.serviceId",
+                      "Service.name",
+                      "Service.duration",
+                      "Pet.petId",
+                      "Pet.name",
+                      "Order.orderId"
+                    ],
+                    "writesFields": [
+                      "ServiceBooking.serviceBookingId",
+                      "ServiceBooking.serviceId",
+                      "ServiceBooking.petId",
+                      "ServiceBooking.scheduledDate",
+                      "ServiceBooking.scheduledStartTime",
+                      "ServiceBooking.scheduledEndTime",
+                      "ServiceBooking.timezone",
+                      "ServiceBooking.status",
+                      "Order.scheduled_service_at"
+                    ],
+                    "rulesApplied": [
+                      "ruleServiceBookingRequiresSlot"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "bffCommands": [
+            {
+              "commandName": "getProductServiceDetail",
+              "purpose": "Carregar detalhes completos do produto ou serviço.",
+              "kind": "query",
+              "input": {
+                "itemId": "uuid",
+                "itemType": "string"
+              },
+              "output": {
+                "item": {
+                  "id": "uuid",
+                  "type": "string",
+                  "name": "string",
+                  "description": "string",
+                  "price": "number",
+                  "currency": "string",
+                  "availabilityStatus": "string",
+                  "categories": [
+                    {
+                      "categoryId": "uuid",
+                      "name": "string"
+                    }
+                  ],
+                  "images": [
+                    "string"
+                  ],
+                  "serviceDurationMinutes": "number"
+                },
+                "availabilityNotes": "string"
+              },
+              "readsEntities": [
+                "Product",
+                "Service",
+                "CatalogCategory"
+              ],
+              "writesEntities": [],
+              "readsTables": [],
+              "writesTables": [],
+              "usecaseRefs": [
+                "usecaseViewProductService"
+              ],
+              "layerContract": {
+                "controllerLayer": "layer_2_controllers",
+                "mustCallLayer": "layer_3_usecases",
+                "directTableAccessForbidden": true
+              },
+              "rulesApplied": []
+            },
+            {
+              "commandName": "addItemToCart",
+              "purpose": "Adicionar item selecionado ao carrinho do cliente.",
+              "kind": "command",
+              "input": {
+                "itemId": "uuid",
+                "itemType": "string",
+                "quantity": "number"
+              },
+              "output": {
+                "cartId": "uuid",
+                "itemsCount": "number",
+                "subtotalAmount": "number",
+                "discountAmount": "number",
+                "totalAmount": "number",
+                "currency": "string"
+              },
+              "readsEntities": [
+                "Cart",
+                "CartItem",
+                "Product",
+                "Service"
+              ],
+              "writesEntities": [
+                "Cart",
+                "CartItem"
+              ],
+              "readsTables": [
+                "cart"
+              ],
+              "writesTables": [
+                "cart"
+              ],
+              "usecaseRefs": [
+                "usecaseAddToCart"
+              ],
+              "layerContract": {
+                "controllerLayer": "layer_2_controllers",
+                "mustCallLayer": "layer_3_usecases",
+                "directTableAccessForbidden": true
+              },
+              "rulesApplied": []
+            },
+            {
+              "commandName": "scheduleService",
+              "purpose": "Criar agendamento de serviço quando aplicável.",
+              "kind": "command",
+              "input": {
+                "serviceId": "uuid",
+                "petId": "uuid",
+                "scheduledDate": "date",
+                "scheduledStartTime": "time",
+                "scheduledEndTime": "time",
+                "timezone": "string",
+                "orderId": "uuid?"
+              },
+              "output": {
+                "serviceBookingId": "uuid",
+                "status": "string",
+                "scheduledDate": "date",
+                "scheduledStartTime": "time",
+                "scheduledEndTime": "time"
+              },
+              "readsEntities": [
+                "ServiceBooking",
+                "Order",
+                "Service",
+                "Pet",
+                "Customer"
+              ],
+              "writesEntities": [
+                "ServiceBooking",
+                "Order"
+              ],
+              "readsTables": [
+                "order"
+              ],
+              "writesTables": [
+                "serviceBooking",
+                "order"
+              ],
+              "usecaseRefs": [
+                "usecaseScheduleService"
+              ],
+              "layerContract": {
+                "controllerLayer": "layer_2_controllers",
+                "mustCallLayer": "layer_3_usecases",
+                "directTableAccessForbidden": true
+              },
+              "rulesApplied": [
+                "ruleServiceBookingRequiresSlot"
+              ]
+            }
+          ]
+        },
+        "questions": [
+          "Existe um caso de uso aprovado para leitura de detalhes do produto/serviço pelo cliente (ex.: usecaseViewProductService) ou devemos criar um novo caso de uso específico?",
+          "A seleção de horários disponíveis deve vir junto no detalhe do serviço ou requer um endpoint dedicado de disponibilidade?",
+          "O item é identificado por (itemId,itemType) na rota ou prefere separar como productId e serviceId em rotas distintas?"
+        ],
+        "trace": [
+          "Planificada a página de detalhes com três seções: informações do item, ação de carrinho e formulário de agendamento.",
+          "Comandos BFF alinhados aos hints do índice e ao workflow de agendamento.",
+          "Pontos em aberto: caso de uso para leitura do detalhe e fonte de disponibilidade de horários."
+        ]
+      }
+    },
+    "status": "completed",
+    "stepId": 88,
+    "interaction": null,
+    "nextSteps": null
+  }
+}

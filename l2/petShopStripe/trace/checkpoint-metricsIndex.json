@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "2026-06-06",
+  "artifactType": "indexCheckpoint",
+  "indexName": "metricsIndex",
+  "moduleName": "petShopStripe",
+  "status": "frozen",
+  "approvedAt": "2026-06-08T12:19:10.202Z",
+  "source": {
+    "agentName": "agentPlanMetricsIndex",
+    "stepId": 51,
+    "planId": "plan-index-critic:metricsIndex:2"
+  },
+  "healthReport": {
+    "localErrors": [],
+    "localWarnings": [],
+    "criticErrors": [],
+    "criticWarnings": [
+      {
+        "severity": "warning",
+        "code": "WIDGET_TITLE_MISMATCH",
+        "message": "Widget 'approvalRateChart' possui título 'Taxa de aprovação de pagamentos', mas utiliza a métrica de contagem 'approvedPayments' sem denominador ou medida de taxa correspondente.",
+        "path": "dashboardPages[0].widgets[3]"
+      }
+    ],
+    "attempts": 2,
+    "notes": []
+  },
+  "index": {
+    "runId": "provider-tool-call",
+    "stepId": "repair:metricsIndex",
+    "schemaVersion": "2026-06-02",
+    "status": "ok",
+    "result": {
+      "metricsPlan": {
+        "enabled": true,
+        "storageEngine": "postgresTimescaleDB",
+        "moduleId": "petShopStripe",
+        "title": "Métricas operacionais do pet shop",
+        "description": "Métricas de vendas, pagamentos e agendamentos para acompanhamento administrativo.",
+        "updateResponsibility": "layer_3_usecases",
+        "derivationSources": [
+          "baseTableUpdates",
+          "lifecycleTransitions",
+          "operationalRisks"
+        ]
+      },
+      "metricTables": [
+        {
+          "metricTableId": "salesOpsMetrics",
+          "tableName": "sales_ops_metrics",
+          "title": "Métricas de vendas e pagamentos",
+          "purpose": "Agregar dados de pedidos e pagamentos para análise de receita, ticket médio, volume de pedidos e taxa de aprovação.",
+          "storageEngine": "postgresTimescaleDB",
+          "sourceBaseTables": [
+            "order",
+            "serviceBooking"
+          ],
+          "sourceEntities": [
+            "Order",
+            "OrderItem",
+            "Payment",
+            "ServiceBooking"
+          ],
+          "sourceWriteEvents": [
+            "orderCreated",
+            "orderPaid",
+            "orderCanceled",
+            "serviceBookingCreated",
+            "serviceBookingConfirmed"
+          ],
+          "timeColumn": "event_time",
+          "dimensions": [
+            {
+              "dimensionId": "orderStatus",
+              "column": "order_status",
+              "type": "text",
+              "description": "Status do pedido no momento do evento"
+            },
+            {
+              "dimensionId": "paymentStatus",
+              "column": "payment_status",
+              "type": "text",
+              "description": "Status do pagamento associado"
+            },
+            {
+              "dimensionId": "itemType",
+              "column": "item_type",
+              "type": "text",
+              "description": "Tipo do item vendido (produto ou serviço)"
+            }
+          ],
+          "measures": [
+            {
+              "measureId": "totalRevenue",
+              "column": "order_total",
+              "type": "numeric",
+              "aggregation": "sum",
+              "unit": "BRL",
+              "description": "Valor total dos pedidos"
+            },
+            {
+              "measureId": "orderCount",
+              "column": "order_count",
+              "type": "integer",
+              "aggregation": "sum",
+              "unit": "count",
+              "description": "Quantidade de pedidos"
+            },
+            {
+              "measureId": "averageTicket",
+              "column": "order_total",
+              "type": "numeric",
+              "aggregation": "avg",
+              "unit": "BRL",
+              "description": "Ticket médio dos pedidos"
+            },
+            {
+              "measureId": "approvedPayments",
+              "column": "approved_count",
+              "type": "integer",
+              "aggregation": "sum",
+              "unit": "count",
+              "description": "Quantidade de pagamentos aprovados"
+            },
+            {
+              "measureId": "canceledOrders",
+              "column": "canceled_count",
+              "type": "integer",
+              "aggregation": "sum",
+              "unit": "count",
+              "description": "Quantidade de pedidos cancelados"
+            }
+          ],
+          "aggregationWindows": [
+            "1 hour",
+            "1 day",
+            "1 week",
+            "1 month"
+          ],
+          "retentionPolicy": "Dados brutos por 90 dias, agregações diárias por 1 ano, agregações mensais por 3 anos.",
+          "priority": "now",
+          "rulesApplied": [
+            "ruleMetricsUpdateOnOrderPaid"
+          ],
+          "reason": "Suportar o dashboard administrativo de métricas e a visão financeira do pet shop."
+        }
+      ],
+      "dashboardPages": [
+        {
+          "metricDashboardId": "adminMetricsDashboard",
+          "title": "Dashboard administrativo de métricas",
+          "actor": "adminPetShop",
+          "accessPolicy": "adminOnly",
+          "description": "Painel com indicadores de vendas, receita e pagamentos para gestão do pet shop.",
+          "priority": "now",
+          "sources": [
+            "salesOpsMetrics"
+          ],
+          "rulesApplied": [
+            "ruleMetricsUpdateOnOrderPaid"
+          ],
+          "widgets": [
+            {
+              "widgetId": "revenueChart",
+              "title": "Receita ao longo do tempo",
+              "metricId": "totalRevenue",
+              "type": "lineChart",
+              "sourceMetricTable": "salesOpsMetrics"
+            },
+            {
+              "widgetId": "ordersVolumeChart",
+              "title": "Volume de pedidos",
+              "metricId": "orderCount",
+              "type": "barChart",
+              "sourceMetricTable": "salesOpsMetrics"
+            },
+            {
+              "widgetId": "averageTicketChart",
+              "title": "Ticket médio",
+              "metricId": "averageTicket",
+              "type": "lineChart",
+              "sourceMetricTable": "salesOpsMetrics"
+            },
+            {
+              "widgetId": "approvalRateChart",
+              "title": "Taxa de aprovação de pagamentos",
+              "metricId": "approvedPayments",
+              "type": "lineChart",
+              "sourceMetricTable": "salesOpsMetrics"
+            },
+            {
+              "widgetId": "canceledOrdersChart",
+              "title": "Pedidos cancelados",
+              "metricId": "canceledOrders",
+              "type": "barChart",
+              "sourceMetricTable": "salesOpsMetrics"
+            }
+          ]
+        }
+      ]
+    },
+    "questions": [],
+    "trace": [
+      "Corrigida referência de sourceMetricTable nos widgets de sales_ops_metrics para salesOpsMetrics (metricTableId).",
+      "Corrigida referência de sources no dashboard adminMetricsDashboard de sales_ops_metrics para salesOpsMetrics.",
+      "Corrigido sourceBaseTables de service_booking para serviceBooking para alinhar com moduleTableIds conhecidos."
+    ]
+  }
+}

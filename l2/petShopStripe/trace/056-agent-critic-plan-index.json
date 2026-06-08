@@ -1,0 +1,68 @@
+{
+  "savedAt": "2026-06-08T12:23:51.284Z",
+  "agentName": "agentCriticPlanIndex",
+  "stepId": 56,
+  "planning": {
+    "planId": "plan-index-critic:usecasePlan:1",
+    "dependsOn": [
+      "plan-usecase-entities"
+    ],
+    "executionMode": "sequential",
+    "executionHost": "client"
+  },
+  "status": "waiting_after_prompt",
+  "payload": {
+    "type": "flexible",
+    "result": {
+      "toolName": "submitPlanIndexCritique",
+      "arguments": {
+        "status": "ok",
+        "result": {
+          "approved": false,
+          "errors": [
+            {
+              "code": "MISSING_USECASE",
+              "message": "Falta o usecase para o comando manageCatalog (gerenciar catálogo), presente nas ações do usuário e nos artefatos aprovados.",
+              "path": "usecases"
+            },
+            {
+              "code": "MISSING_USECASE",
+              "message": "Falta o usecase para o comando reconcilePayments (conciliar recebíveis), presente nas ações do usuário e nos artefatos aprovados.",
+              "path": "usecases"
+            },
+            {
+              "code": "INVENTED_COMMAND",
+              "message": "O usecase usecaseUpdateMetricsOnOrderPaid referencia o comando 'usecaseUpdateMetricsOnOrderPaid', que não existe nas ações do usuário. Comandos devem corresponder a ações de BFF reais.",
+              "path": "usecases[?(@.usecaseId=='usecaseUpdateMetricsOnOrderPaid')].commands"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "RULE_ON_READ_USECASE",
+              "message": "O usecase usecaseGetMetricsDashboard é somente leitura mas aplica a regra ruleMetricsUpdateOnOrderPaid, que é de atualização.",
+              "path": "usecases[?(@.usecaseId=='usecaseGetMetricsDashboard')].rulesApplied"
+            },
+            {
+              "code": "METRICS_UPDATE_ON_GENERIC_STATUS",
+              "message": "O usecase usecaseUpdateOrderStatus atualiza salesOpsMetrics em qualquer alteração de status, mas a regra ruleMetricsUpdateOnOrderPaid se aplica especificamente a pedidos pagos. Verificar se a lógica filtra corretamente.",
+              "path": "usecases[?(@.usecaseId=='usecaseUpdateOrderStatus')].rulesApplied"
+            }
+          ],
+          "notes": []
+        },
+        "questions": [],
+        "trace": [
+          "Verificados artefatos aprovados e ações do usuário contra usecases existentes.",
+          "Confirmada ausência de usecases para manageCatalog e reconcilePayments.",
+          "Confirmado comando inventado em usecaseUpdateMetricsOnOrderPaid.",
+          "Verificada cobertura de tabelas do módulo e atualização de métricas.",
+          "Verificada aplicação de regras nos usecases de leitura e atualização."
+        ]
+      }
+    },
+    "status": "completed",
+    "stepId": 57,
+    "interaction": null,
+    "nextSteps": null
+  }
+}

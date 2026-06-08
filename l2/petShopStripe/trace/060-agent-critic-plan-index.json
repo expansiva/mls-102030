@@ -1,0 +1,62 @@
+{
+  "savedAt": "2026-06-08T12:30:05.813Z",
+  "agentName": "agentCriticPlanIndex",
+  "stepId": 60,
+  "planning": {
+    "planId": "plan-index-critic:workflowIndex:1",
+    "dependsOn": [
+      "plan-workflow-index"
+    ],
+    "executionMode": "sequential",
+    "executionHost": "client"
+  },
+  "status": "waiting_after_prompt",
+  "payload": {
+    "type": "flexible",
+    "result": {
+      "toolName": "submitPlanIndexCritique",
+      "arguments": {
+        "status": "ok",
+        "result": {
+          "approved": false,
+          "errors": [
+            {
+              "code": "workflow.executionMode.mismatch",
+              "message": "checkoutAndPayment é um fluxo do cliente (actor cliente) com createsTask=false; executionMode deve refletir uiState ou entityLifecycle, não taskWorkflow.",
+              "path": "workflows[0]"
+            },
+            {
+              "code": "workflow.missingApprovedArtifact",
+              "message": "abandonedCartCleanup não consta em approvedArtifacts.workflows e é um item inventado fora do escopo aprovado.",
+              "path": "workflows[5]"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "workflow.usecaseRef.unknown",
+              "message": "workflow paymentReconciliation references unknown usecase usecaseReconcilePayments",
+              "path": "workflows[3]"
+            },
+            {
+              "code": "workflow.usecaseRef.unknown",
+              "message": "workflow catalogManagement references unknown usecase usecaseManageCatalog",
+              "path": "workflows[4]"
+            }
+          ],
+          "notes": []
+        },
+        "questions": [],
+        "trace": [
+          "Verificado executionMode de cada workflow contra createsTask e actors.",
+          "Confirmado que checkoutAndPayment (cliente, createsTask=false) está com executionMode incorreto.",
+          "Verificado approvedArtifacts.workflows e confirmado que abandonedCartCleanup não está aprovado.",
+          "Repetidos warnings determinísticos de usecaseRefs desconhecidos."
+        ]
+      }
+    },
+    "status": "completed",
+    "stepId": 61,
+    "interaction": null,
+    "nextSteps": null
+  }
+}
