@@ -1,0 +1,273 @@
+{
+  "savedAt": "2026-06-08T12:31:59.487Z",
+  "agentName": "agentRepairPlanIndex",
+  "stepId": 67,
+  "planning": {
+    "planId": "plan-index-repair:workflowIndex:2",
+    "dependsOn": [
+      "plan-index-critic:workflowIndex:2"
+    ],
+    "executionMode": "sequential",
+    "executionHost": "client"
+  },
+  "status": "waiting_after_prompt",
+  "payload": {
+    "type": "flexible",
+    "result": {
+      "toolName": "submitRepairedWorkflowIndex",
+      "arguments": {
+        "status": "ok",
+        "result": {
+          "workflows": [
+            {
+              "workflowId": "checkoutAndPayment",
+              "title": "Checkout e pagamento",
+              "purpose": "Fluxo de compra do cliente desde o carrinho até a confirmação de pagamento via Stripe, incluindo criação do pedido e atualização de métricas.",
+              "executionMode": "entityLifecycle",
+              "createsTask": false,
+              "priority": "now",
+              "actors": [
+                "cliente"
+              ],
+              "relatedEntities": [
+                "Cart",
+                "CartItem",
+                "Order",
+                "OrderItem",
+                "Payment",
+                "StripeTransaction"
+              ],
+              "persistenceRefs": [
+                "cart",
+                "order"
+              ],
+              "usecaseRefs": [
+                "usecaseCreateOrder",
+                "usecaseConfirmStripePayment",
+                "usecaseUpdateMetricsOnOrderPaid"
+              ],
+              "metricRefs": [
+                "salesOpsMetrics"
+              ],
+              "relatedCapabilities": [
+                "manageCartCheckout",
+                "payWithStripe"
+              ],
+              "rulesApplied": [
+                "ruleOrderRequiresCustomer",
+                "ruleOrderStatusLifecycle",
+                "rulePaymentRequiredToConfirmOrder",
+                "ruleStripeTransactionLink",
+                "ruleMetricsUpdateOnOrderPaid"
+              ],
+              "implementationSuggestions": [
+                {
+                  "suggestionId": "suggestStripeWebhookHandler",
+                  "title": "Processar confirmações de pagamento via webhook Stripe de forma assíncrona",
+                  "reason": "Garantir idempotência e confiabilidade na transição de status do pedido",
+                  "priority": "now"
+                },
+                {
+                  "suggestionId": "suggestCartExpirationJob",
+                  "title": "Expirar carrinhos abandonados automaticamente após período de inatividade",
+                  "reason": "Manter consistência de estoque e evitar carrinhos obsoletos",
+                  "priority": "soon"
+                }
+              ]
+            },
+            {
+              "workflowId": "serviceBooking",
+              "title": "Agendamento de serviço",
+              "purpose": "Permitir ao cliente selecionar data e horário disponíveis para serviços como banho e tosa, vinculando o agendamento ao pedido e gerando entrada na agenda administrativa.",
+              "executionMode": "taskWorkflow",
+              "createsTask": true,
+              "priority": "soon",
+              "actors": [
+                "cliente",
+                "adminPetShop"
+              ],
+              "relatedEntities": [
+                "ServiceBooking",
+                "Service",
+                "Pet",
+                "Order"
+              ],
+              "persistenceRefs": [
+                "serviceBooking",
+                "order"
+              ],
+              "usecaseRefs": [
+                "usecaseScheduleService"
+              ],
+              "metricRefs": [
+                "salesOpsMetrics"
+              ],
+              "relatedCapabilities": [
+                "bookService"
+              ],
+              "rulesApplied": [
+                "ruleServiceBookingRequiresSlot"
+              ],
+              "implementationSuggestions": [
+                {
+                  "suggestionId": "suggestRealTimeSlotCheck",
+                  "title": "Verificar disponibilidade de horários em tempo real durante a seleção",
+                  "reason": "Prevenir double-booking e garantir regra de slot disponível",
+                  "priority": "now"
+                },
+                {
+                  "suggestionId": "suggestBookingReminderNotification",
+                  "title": "Enviar lembrete automático de agendamento ao cliente",
+                  "reason": "Reduzir no-shows e melhorar ocupação da agenda",
+                  "priority": "soon"
+                }
+              ]
+            },
+            {
+              "workflowId": "orderLifecycleManagement",
+              "title": "Gestão do ciclo de vida do pedido",
+              "purpose": "Acompanhar e atualizar os status dos pedidos e serviços agendados, da criação até a separação, conclusão ou cancelamento, com atualização de métricas.",
+              "executionMode": "entityLifecycle",
+              "createsTask": false,
+              "priority": "now",
+              "actors": [
+                "adminPetShop"
+              ],
+              "relatedEntities": [
+                "Order",
+                "OrderItem",
+                "ServiceBooking"
+              ],
+              "persistenceRefs": [
+                "order",
+                "serviceBooking"
+              ],
+              "usecaseRefs": [
+                "usecaseUpdateOrderStatus"
+              ],
+              "metricRefs": [
+                "salesOpsMetrics"
+              ],
+              "relatedCapabilities": [
+                "manageOrdersServices"
+              ],
+              "rulesApplied": [
+                "ruleOrderStatusLifecycle",
+                "ruleMetricsUpdateOnOrderPaid"
+              ],
+              "implementationSuggestions": [
+                {
+                  "suggestionId": "suggestStatusTransitionValidation",
+                  "title": "Validar transições de status do pedido exclusivamente no backend",
+                  "reason": "Garantir integridade do ciclo de vida e evitar estados inválidos",
+                  "priority": "now"
+                },
+                {
+                  "suggestionId": "suggestServiceFulfillmentTask",
+                  "title": "Criar tarefa de cumprimento para serviços agendados na agenda da equipe",
+                  "reason": "Coordenar execução de banho/tosa e rastrear conclusão",
+                  "priority": "soon"
+                }
+              ]
+            },
+            {
+              "workflowId": "paymentReconciliation",
+              "title": "Conciliação de recebíveis",
+              "purpose": "Registrar recebíveis a partir de pagamentos aprovados e conciliar transações Stripe com lançamentos financeiros do pet shop.",
+              "executionMode": "taskWorkflow",
+              "createsTask": true,
+              "priority": "soon",
+              "actors": [
+                "adminPetShop"
+              ],
+              "relatedEntities": [
+                "Payment",
+                "StripeTransaction",
+                "Receivable",
+                "FinancialEntry",
+                "Order"
+              ],
+              "persistenceRefs": [
+                "order"
+              ],
+              "usecaseRefs": [
+                "usecaseReconcilePayments"
+              ],
+              "metricRefs": [
+                "salesOpsMetrics"
+              ],
+              "relatedCapabilities": [
+                "financialOverview"
+              ],
+              "rulesApplied": [
+                "ruleReceivableFromPayment",
+                "ruleStripeTransactionLink"
+              ],
+              "implementationSuggestions": [
+                {
+                  "suggestionId": "suggestStripePayoutAutoSync",
+                  "title": "Sincronizar payouts e extratos Stripe automaticamente",
+                  "reason": "Manter recebíveis atualizados sem intervenção manual",
+                  "priority": "soon"
+                },
+                {
+                  "suggestionId": "suggestReconciliationPendingAlert",
+                  "title": "Alertar administrador sobre transações pendentes de conciliação",
+                  "reason": "Evitar atraso no fechamento financeiro e garantir rastreabilidade",
+                  "priority": "soon"
+                }
+              ]
+            },
+            {
+              "workflowId": "catalogManagement",
+              "title": "Gestão de catálogo",
+              "purpose": "Fluxo administrativo para criação, edição, ativação e desativação de produtos, serviços e categorias no catálogo do pet shop.",
+              "executionMode": "entityLifecycle",
+              "createsTask": false,
+              "priority": "now",
+              "actors": [
+                "adminPetShop"
+              ],
+              "relatedEntities": [
+                "Product",
+                "Service",
+                "CatalogCategory"
+              ],
+              "persistenceRefs": [],
+              "usecaseRefs": [
+                "usecaseManageCatalog"
+              ],
+              "metricRefs": [],
+              "relatedCapabilities": [
+                "manageCatalog"
+              ],
+              "rulesApplied": [],
+              "implementationSuggestions": [
+                {
+                  "suggestionId": "suggestCatalogAuditLog",
+                  "title": "Manter histórico de alterações de preço e disponibilidade do catálogo",
+                  "reason": "Auditar mudanças e facilitar rollback",
+                  "priority": "soon"
+                },
+                {
+                  "suggestionId": "suggestBulkCatalogEdit",
+                  "title": "Suportar edição em lote de produtos e serviços",
+                  "reason": "Agilizar atualizações sazonais e promoções",
+                  "priority": "later"
+                }
+              ]
+            }
+          ]
+        },
+        "questions": [],
+        "trace": [
+          "Corrigido createsTask de true para false no workflow orderLifecycleManagement (workflows[2]), pois o fluxo descreve apenas acompanhamento e atualização de status de entidades (entityLifecycle), e a criação de tarefas para a equipe consta apenas como sugestão futura."
+        ]
+      }
+    },
+    "status": "completed",
+    "stepId": 68,
+    "interaction": null,
+    "nextSteps": null
+  }
+}

@@ -1,0 +1,539 @@
+{
+  "schemaVersion": "2026-06-06",
+  "artifactType": "indexCheckpoint",
+  "indexName": "usecasePlan",
+  "moduleName": "petShopStripe",
+  "status": "frozen",
+  "approvedAt": "2026-06-08T12:27:47.660Z",
+  "source": {
+    "agentName": "agentPlanUsecaseEntities",
+    "stepId": 61,
+    "planId": "plan-index-critic:usecasePlan:2"
+  },
+  "healthReport": {
+    "localErrors": [],
+    "localWarnings": [
+      {
+        "severity": "warning",
+        "code": "usecase.tableRef.unknown",
+        "message": "usecase usecaseManageCatalog references unknown table product",
+        "path": "usecases[12]"
+      },
+      {
+        "severity": "warning",
+        "code": "usecase.tableRef.unknown",
+        "message": "usecase usecaseManageCatalog references unknown table service",
+        "path": "usecases[12]"
+      },
+      {
+        "severity": "warning",
+        "code": "usecase.tableRef.unknown",
+        "message": "usecase usecaseManageCatalog references unknown table catalogCategory",
+        "path": "usecases[12]"
+      },
+      {
+        "severity": "warning",
+        "code": "usecase.tableRef.unknown",
+        "message": "usecase usecaseManageCatalog references unknown table product",
+        "path": "usecases[12]"
+      },
+      {
+        "severity": "warning",
+        "code": "usecase.tableRef.unknown",
+        "message": "usecase usecaseManageCatalog references unknown table service",
+        "path": "usecases[12]"
+      },
+      {
+        "severity": "warning",
+        "code": "usecase.tableRef.unknown",
+        "message": "usecase usecaseManageCatalog references unknown table catalogCategory",
+        "path": "usecases[12]"
+      },
+      {
+        "severity": "warning",
+        "code": "usecase.tableRef.unknown",
+        "message": "usecase usecaseReconcilePayments references unknown table payment",
+        "path": "usecases[13]"
+      },
+      {
+        "severity": "warning",
+        "code": "usecase.tableRef.unknown",
+        "message": "usecase usecaseReconcilePayments references unknown table stripeTransaction",
+        "path": "usecases[13]"
+      },
+      {
+        "severity": "warning",
+        "code": "usecase.tableRef.unknown",
+        "message": "usecase usecaseReconcilePayments references unknown table receivable",
+        "path": "usecases[13]"
+      },
+      {
+        "severity": "warning",
+        "code": "usecase.tableRef.unknown",
+        "message": "usecase usecaseReconcilePayments references unknown table financialEntry",
+        "path": "usecases[13]"
+      }
+    ],
+    "criticErrors": [],
+    "criticWarnings": [],
+    "attempts": 2,
+    "notes": [
+      "critic LLM failed, approved by fallback: critic returned status needs_input"
+    ]
+  },
+  "index": {
+    "runId": "provider-tool-call",
+    "stepId": "repair:usecasePlan",
+    "schemaVersion": "2026-06-02",
+    "status": "ok",
+    "result": {
+      "backendArchitecture": {
+        "pattern": "cleanArchitecture",
+        "layer2Responsibility": "Orquestrar requisições dos BFF/controllers e chamar casos de uso sem acesso direto a tabelas.",
+        "layer3Responsibility": "Executar regras de negócio, ler/escrever tabelas layer_1_external e atualizar métricas.",
+        "layer1Responsibility": "Persistência de dados transacionais e métricas acessíveis apenas por casos de uso."
+      },
+      "usecaseEntities": [
+        {
+          "usecaseEntityId": "cartAggregate",
+          "title": "Carrinho",
+          "purpose": "Representar o agregado de carrinho com itens e totais para operações de compra.",
+          "sourceTables": [
+            "cart"
+          ],
+          "allowedOperations": [
+            "read",
+            "write"
+          ],
+          "layer": "layer_3_usecases",
+          "rulesApplied": []
+        },
+        {
+          "usecaseEntityId": "orderAggregate",
+          "title": "Pedido",
+          "purpose": "Representar o agregado de pedido com itens, status e pagamento.",
+          "sourceTables": [
+            "order"
+          ],
+          "allowedOperations": [
+            "read",
+            "write"
+          ],
+          "layer": "layer_3_usecases",
+          "rulesApplied": [
+            "ruleOrderRequiresCustomer",
+            "ruleOrderStatusLifecycle",
+            "rulePaymentRequiredToConfirmOrder"
+          ]
+        },
+        {
+          "usecaseEntityId": "serviceBookingAggregate",
+          "title": "Agendamento de serviço",
+          "purpose": "Representar reservas de serviços com data, horário e vínculo ao pedido.",
+          "sourceTables": [
+            "serviceBooking"
+          ],
+          "allowedOperations": [
+            "read",
+            "write"
+          ],
+          "layer": "layer_3_usecases",
+          "rulesApplied": [
+            "ruleServiceBookingRequiresSlot"
+          ]
+        },
+        {
+          "usecaseEntityId": "salesOpsMetricsAggregate",
+          "title": "Métricas de vendas e pagamentos",
+          "purpose": "Representar séries temporais de métricas operacionais alimentadas por pedidos e agendamentos.",
+          "sourceTables": [
+            "salesOpsMetrics"
+          ],
+          "allowedOperations": [
+            "read",
+            "write"
+          ],
+          "layer": "layer_3_usecases",
+          "rulesApplied": [
+            "ruleMetricsUpdateOnOrderPaid"
+          ]
+        },
+        {
+          "usecaseEntityId": "catalogAggregate",
+          "title": "Catálogo",
+          "purpose": "Representar o agregado de produtos, serviços e categorias para gestão administrativa.",
+          "sourceTables": [
+            "product",
+            "service",
+            "catalogCategory"
+          ],
+          "allowedOperations": [
+            "read",
+            "write"
+          ],
+          "layer": "layer_3_usecases",
+          "rulesApplied": []
+        },
+        {
+          "usecaseEntityId": "receivableAggregate",
+          "title": "Recebíveis",
+          "purpose": "Representar recebíveis e lançamentos financeiros para conciliação de pagamentos.",
+          "sourceTables": [
+            "receivable",
+            "financialEntry"
+          ],
+          "allowedOperations": [
+            "read",
+            "write"
+          ],
+          "layer": "layer_3_usecases",
+          "rulesApplied": [
+            "ruleReceivableFromPayment"
+          ]
+        }
+      ],
+      "usecases": [
+        {
+          "usecaseId": "usecaseGetCart",
+          "title": "Consultar carrinho",
+          "purpose": "Carregar o carrinho ativo do cliente com itens e totais.",
+          "actor": "cliente",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "cartAggregate"
+          ],
+          "outputEntities": [
+            "cartAggregate"
+          ],
+          "readsTables": [
+            "cart"
+          ],
+          "writesTables": [],
+          "rulesApplied": []
+        },
+        {
+          "usecaseId": "usecaseAddToCart",
+          "title": "Adicionar item ao carrinho",
+          "purpose": "Adicionar produto ou serviço ao carrinho do cliente e recalcular totais.",
+          "actor": "cliente",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "cartAggregate"
+          ],
+          "outputEntities": [
+            "cartAggregate"
+          ],
+          "readsTables": [
+            "cart"
+          ],
+          "writesTables": [
+            "cart"
+          ],
+          "commands": [
+            "addToCart"
+          ],
+          "rulesApplied": []
+        },
+        {
+          "usecaseId": "usecaseUpdateCart",
+          "title": "Atualizar carrinho",
+          "purpose": "Alterar quantidades ou remover itens do carrinho e atualizar totais.",
+          "actor": "cliente",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "cartAggregate"
+          ],
+          "outputEntities": [
+            "cartAggregate"
+          ],
+          "readsTables": [
+            "cart"
+          ],
+          "writesTables": [
+            "cart"
+          ],
+          "commands": [
+            "updateCart"
+          ],
+          "rulesApplied": []
+        },
+        {
+          "usecaseId": "usecaseCreateOrder",
+          "title": "Criar pedido",
+          "purpose": "Gerar pedido a partir do carrinho confirmado e marcar carrinho como convertido.",
+          "actor": "cliente",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "cartAggregate",
+            "orderAggregate"
+          ],
+          "outputEntities": [
+            "orderAggregate"
+          ],
+          "readsTables": [
+            "cart"
+          ],
+          "writesTables": [
+            "order",
+            "cart"
+          ],
+          "commands": [
+            "startCheckout"
+          ],
+          "rulesApplied": [
+            "ruleOrderRequiresCustomer"
+          ]
+        },
+        {
+          "usecaseId": "usecaseConfirmStripePayment",
+          "title": "Confirmar pagamento Stripe",
+          "purpose": "Atualizar status do pedido após confirmação de pagamento e registrar métricas.",
+          "actor": "cliente",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "orderAggregate",
+            "salesOpsMetricsAggregate"
+          ],
+          "outputEntities": [
+            "orderAggregate",
+            "salesOpsMetricsAggregate"
+          ],
+          "readsTables": [
+            "order"
+          ],
+          "writesTables": [
+            "order",
+            "salesOpsMetrics"
+          ],
+          "commands": [
+            "confirmStripePayment"
+          ],
+          "rulesApplied": [
+            "rulePaymentRequiredToConfirmOrder",
+            "ruleStripeTransactionLink",
+            "ruleMetricsUpdateOnOrderPaid"
+          ]
+        },
+        {
+          "usecaseId": "usecaseScheduleService",
+          "title": "Agendar serviço",
+          "purpose": "Criar agendamento de serviço e vincular ao pedido quando aplicável.",
+          "actor": "cliente",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "serviceBookingAggregate",
+            "orderAggregate"
+          ],
+          "outputEntities": [
+            "serviceBookingAggregate",
+            "orderAggregate"
+          ],
+          "readsTables": [
+            "order"
+          ],
+          "writesTables": [
+            "serviceBooking",
+            "order"
+          ],
+          "commands": [
+            "scheduleService"
+          ],
+          "rulesApplied": [
+            "ruleServiceBookingRequiresSlot"
+          ]
+        },
+        {
+          "usecaseId": "usecaseUpdateOrderStatus",
+          "title": "Atualizar status do pedido",
+          "purpose": "Alterar status do pedido conforme ciclo de vida.",
+          "actor": "adminPetShop",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "orderAggregate"
+          ],
+          "outputEntities": [
+            "orderAggregate"
+          ],
+          "readsTables": [
+            "order"
+          ],
+          "writesTables": [
+            "order"
+          ],
+          "commands": [
+            "updateOrderStatus"
+          ],
+          "rulesApplied": [
+            "ruleOrderStatusLifecycle"
+          ]
+        },
+        {
+          "usecaseId": "usecaseGetOrderHistory",
+          "title": "Listar pedidos do cliente",
+          "purpose": "Listar pedidos do cliente para acompanhamento de histórico.",
+          "actor": "cliente",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "orderAggregate"
+          ],
+          "outputEntities": [
+            "orderAggregate"
+          ],
+          "readsTables": [
+            "order"
+          ],
+          "writesTables": [],
+          "rulesApplied": []
+        },
+        {
+          "usecaseId": "usecaseGetOrderAdminList",
+          "title": "Listar pedidos administrativos",
+          "purpose": "Listar pedidos por status e período para gestão administrativa.",
+          "actor": "adminPetShop",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "orderAggregate"
+          ],
+          "outputEntities": [
+            "orderAggregate"
+          ],
+          "readsTables": [
+            "order"
+          ],
+          "writesTables": [],
+          "rulesApplied": []
+        },
+        {
+          "usecaseId": "usecaseGetServiceBookings",
+          "title": "Listar agendamentos",
+          "purpose": "Consultar agendamentos por cliente, pet ou serviço.",
+          "actor": "adminPetShop",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "serviceBookingAggregate"
+          ],
+          "outputEntities": [
+            "serviceBookingAggregate"
+          ],
+          "readsTables": [
+            "serviceBooking"
+          ],
+          "writesTables": [],
+          "rulesApplied": []
+        },
+        {
+          "usecaseId": "usecaseGetMetricsDashboard",
+          "title": "Consultar métricas de vendas",
+          "purpose": "Obter séries temporais de métricas de vendas e pagamentos para dashboard.",
+          "actor": "adminPetShop",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "salesOpsMetricsAggregate"
+          ],
+          "outputEntities": [
+            "salesOpsMetricsAggregate"
+          ],
+          "readsTables": [
+            "salesOpsMetrics"
+          ],
+          "writesTables": [],
+          "rulesApplied": []
+        },
+        {
+          "usecaseId": "usecaseUpdateMetricsOnOrderPaid",
+          "title": "Atualizar métricas de vendas",
+          "purpose": "Atualizar métricas operacionais quando pedidos são pagos ou cancelados.",
+          "actor": "adminPetShop",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "orderAggregate",
+            "salesOpsMetricsAggregate"
+          ],
+          "outputEntities": [
+            "salesOpsMetricsAggregate"
+          ],
+          "readsTables": [
+            "order"
+          ],
+          "writesTables": [
+            "salesOpsMetrics"
+          ],
+          "commands": [],
+          "rulesApplied": [
+            "ruleMetricsUpdateOnOrderPaid"
+          ]
+        },
+        {
+          "usecaseId": "usecaseManageCatalog",
+          "title": "Gerenciar catálogo",
+          "purpose": "Cadastrar, editar ou desativar produtos e serviços, preços e disponibilidade.",
+          "actor": "adminPetShop",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "catalogAggregate"
+          ],
+          "outputEntities": [
+            "catalogAggregate"
+          ],
+          "readsTables": [
+            "product",
+            "service",
+            "catalogCategory"
+          ],
+          "writesTables": [
+            "product",
+            "service",
+            "catalogCategory"
+          ],
+          "commands": [
+            "manageCatalog"
+          ],
+          "rulesApplied": []
+        },
+        {
+          "usecaseId": "usecaseReconcilePayments",
+          "title": "Conciliar recebíveis",
+          "purpose": "Registrar conciliação de pagamentos aprovados e lançar recebíveis.",
+          "actor": "adminPetShop",
+          "layer": "layer_3_usecases",
+          "inputEntities": [
+            "receivableAggregate",
+            "orderAggregate"
+          ],
+          "outputEntities": [
+            "receivableAggregate"
+          ],
+          "readsTables": [
+            "order",
+            "payment",
+            "stripeTransaction"
+          ],
+          "writesTables": [
+            "receivable",
+            "financialEntry"
+          ],
+          "commands": [
+            "reconcilePayments"
+          ],
+          "rulesApplied": [
+            "ruleReceivableFromPayment"
+          ]
+        }
+      ],
+      "controllerRules": {
+        "bffMustCallUsecases": true,
+        "bffDirectTableAccessForbidden": true
+      }
+    },
+    "questions": [],
+    "trace": [
+      "Adicionado usecaseEntity catalogAggregate para suportar gerenciamento de catálogo com tabelas product, service e catalogCategory.",
+      "Adicionado usecaseEntity receivableAggregate para suportar conciliação de recebíveis com tabelas receivable e financialEntry.",
+      "Adicionado usecase usecaseManageCatalog vinculado ao comando manageCatalog do adminPetShop.",
+      "Adicionado usecase usecaseReconcilePayments vinculado ao comando reconcilePayments e à regra ruleReceivableFromPayment.",
+      "Removido comando inventado 'usecaseUpdateMetricsOnOrderPaid' do usecase usecaseUpdateMetricsOnOrderPaid; commands ajustado para [].",
+      "Removida regra ruleMetricsUpdateOnOrderPaid do usecase usecaseGetMetricsDashboard, pois é somente leitura.",
+      "Removida atualização de salesOpsMetrics do usecase usecaseUpdateOrderStatus (status genérico não deve atualizar métricas de pagamento); ajustadas inputEntities, outputEntities, writesTables e rulesApplied."
+    ]
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "savedAt": "2026-06-08T12:27:47.655Z",
+  "agentName": "agentCriticPlanIndex",
+  "stepId": 61,
+  "planning": {
+    "planId": "plan-index-critic:usecasePlan:2",
+    "dependsOn": [
+      "plan-index-repair:usecasePlan:1"
+    ],
+    "executionMode": "sequential",
+    "executionHost": "client"
+  },
+  "status": "waiting_after_prompt",
+  "payload": {
+    "type": "flexible",
+    "result": {
+      "toolName": "submitPlanIndexCritique",
+      "arguments": {
+        "status": "needs_input",
+        "result": {
+          "approved": false,
+          "errors": [
+            {
+              "code": "usecase.missing.read.catalog",
+              "message": "Faltam usecases de leitura do catálogo para o actor cliente. As ações browseCatalog e viewProductService não possuem usecase correspondente; o usecaseManageCatalog é exclusivo do adminPetShop.",
+              "path": "usecases"
+            },
+            {
+              "code": "usecase.missing.read.financial",
+              "message": "Falta usecase de leitura para a visão financeira. A ação viewFinancial do adminPetShop não possui usecase correspondente; apenas o usecaseReconcilePayments (escrita) existe.",
+              "path": "usecases"
+            }
+          ],
+          "warnings": [
+            {
+              "code": "usecase.tableRef.unknown",
+              "message": "usecase usecaseManageCatalog references unknown table product",
+              "path": "usecases[12]"
+            },
+            {
+              "code": "usecase.tableRef.unknown",
+              "message": "usecase usecaseManageCatalog references unknown table service",
+              "path": "usecases[12]"
+            },
+            {
+              "code": "usecase.tableRef.unknown",
+              "message": "usecase usecaseManageCatalog references unknown table catalogCategory",
+              "path": "usecases[12]"
+            },
+            {
+              "code": "usecase.tableRef.unknown",
+              "message": "usecase usecaseReconcilePayments references unknown table payment",
+              "path": "usecases[13]"
+            },
+            {
+              "code": "usecase.tableRef.unknown",
+              "message": "usecase usecaseReconcilePayments references unknown table stripeTransaction",
+              "path": "usecases[13]"
+            },
+            {
+              "code": "usecase.tableRef.unknown",
+              "message": "usecase usecaseReconcilePayments references unknown table receivable",
+              "path": "usecases[13]"
+            },
+            {
+              "code": "usecase.tableRef.unknown",
+              "message": "usecase usecaseReconcilePayments references unknown table financialEntry",
+              "path": "usecases[13]"
+            },
+            {
+              "code": "usecase.lifecycle.initialStatusMissing",
+              "message": "usecaseCreateOrder não aplica ruleOrderStatusLifecycle, deixando implícita a transição inicial do pedido para aguardandoPagamento.",
+              "path": "usecases[3]"
+            },
+            {
+              "code": "usecase.metricsUpdate.missingOnCancel",
+              "message": "usecaseUpdateOrderStatus escreve na tabela order mas não atualiza salesOpsMetrics; pedidos pagos e cancelados podem deixar as métricas desatualizadas.",
+              "path": "usecases[6]"
+            },
+            {
+              "code": "usecase.actor.systemLike",
+              "message": "usecaseUpdateMetricsOnOrderPaid não possui commands e tem actor adminPetShop, sugerindo execução automática, mas está modelado como usecase de actor humano.",
+              "path": "usecases[11]"
+            }
+          ],
+          "notes": [
+            "Todas as tabelas desconhecidas (product, service, catalogCategory, payment, stripeTransaction, receivable, financialEntry) são externas ao módulo e confirmam o acesso layer_3_usecases às tabelas layer_1_external.",
+            "As transições de ciclo de vida de pedido (pago, emSeparacao, concluido, cancelado) são cobertas pelos usecases existentes, exceto a definição explícita do estado inicial."
+          ]
+        },
+        "questions": [
+          "O usecase de leitura do catálogo para o cliente (browseCatalog / viewProductService) foi omitido intencionalmente ou deve ser adicionado neste índice?",
+          "O usecase de leitura financeira (viewFinancial) será contemplado em outro índice ou deve ser incluído aqui como usecase de consulta de recebíveis/lançamentos?"
+        ],
+        "trace": [
+          "Verificada cobertura de escrita nas tabelas do módulo: cart, order, serviceBooking e salesOpsMetrics estão cobertas.",
+          "Verificada rastreabilidade BFF commands: addToCart, updateCart, startCheckout, confirmStripePayment, scheduleService, updateOrderStatus, manageCatalog e reconcilePayments possuem usecases.",
+          "Identificada ausência de usecases de leitura para actor cliente no catálogo e para actor adminPetShop no financeiro.",
+          "Verificadas referências a tabelas externas e confirmados os warnings determinísticos.",
+          "Analisada cobertura de ciclo de vida do pedido e atualização de métricas."
+        ]
+      }
+    },
+    "status": "completed",
+    "stepId": 62,
+    "interaction": null,
+    "nextSteps": null
+  }
+}

@@ -1,0 +1,396 @@
+{
+  "savedAt": "2026-06-08T12:20:01.745Z",
+  "agentName": "agentPlanUsecaseEntities",
+  "stepId": 19,
+  "planning": {
+    "planId": "plan-usecase-entities",
+    "dependsOn": [
+      "plan-table-definition",
+      "plan-metric-table-definition"
+    ],
+    "executionMode": "sequential",
+    "executionHost": "client"
+  },
+  "status": "waiting_after_prompt",
+  "payload": {
+    "type": "flexible",
+    "result": {
+      "toolName": "submitUsecaseEntitiesPlan",
+      "arguments": {
+        "status": "ok",
+        "result": {
+          "backendArchitecture": {
+            "pattern": "cleanArchitecture",
+            "layer2Responsibility": "Orquestrar requisições dos BFF/controllers e chamar casos de uso sem acesso direto a tabelas.",
+            "layer3Responsibility": "Executar regras de negócio, ler/escrever tabelas layer_1_external e atualizar métricas.",
+            "layer1Responsibility": "Persistência de dados transacionais e métricas acessíveis apenas por casos de uso."
+          },
+          "usecaseEntities": [
+            {
+              "usecaseEntityId": "cartAggregate",
+              "title": "Carrinho",
+              "purpose": "Representar o agregado de carrinho com itens e totais para operações de compra.",
+              "sourceTables": [
+                "cart"
+              ],
+              "allowedOperations": [
+                "read",
+                "write"
+              ],
+              "layer": "layer_3_usecases",
+              "rulesApplied": []
+            },
+            {
+              "usecaseEntityId": "orderAggregate",
+              "title": "Pedido",
+              "purpose": "Representar o agregado de pedido com itens, status e pagamento.",
+              "sourceTables": [
+                "order"
+              ],
+              "allowedOperations": [
+                "read",
+                "write"
+              ],
+              "layer": "layer_3_usecases",
+              "rulesApplied": [
+                "ruleOrderRequiresCustomer",
+                "ruleOrderStatusLifecycle",
+                "rulePaymentRequiredToConfirmOrder"
+              ]
+            },
+            {
+              "usecaseEntityId": "serviceBookingAggregate",
+              "title": "Agendamento de serviço",
+              "purpose": "Representar reservas de serviços com data, horário e vínculo ao pedido.",
+              "sourceTables": [
+                "serviceBooking"
+              ],
+              "allowedOperations": [
+                "read",
+                "write"
+              ],
+              "layer": "layer_3_usecases",
+              "rulesApplied": [
+                "ruleServiceBookingRequiresSlot"
+              ]
+            },
+            {
+              "usecaseEntityId": "salesOpsMetricsAggregate",
+              "title": "Métricas de vendas e pagamentos",
+              "purpose": "Representar séries temporais de métricas operacionais alimentadas por pedidos e agendamentos.",
+              "sourceTables": [
+                "salesOpsMetrics"
+              ],
+              "allowedOperations": [
+                "read",
+                "write"
+              ],
+              "layer": "layer_3_usecases",
+              "rulesApplied": [
+                "ruleMetricsUpdateOnOrderPaid"
+              ]
+            }
+          ],
+          "usecases": [
+            {
+              "usecaseId": "usecaseGetCart",
+              "title": "Consultar carrinho",
+              "purpose": "Carregar o carrinho ativo do cliente com itens e totais.",
+              "actor": "cliente",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "cartAggregate"
+              ],
+              "outputEntities": [
+                "cartAggregate"
+              ],
+              "readsTables": [
+                "cart"
+              ],
+              "writesTables": [],
+              "rulesApplied": []
+            },
+            {
+              "usecaseId": "usecaseAddToCart",
+              "title": "Adicionar item ao carrinho",
+              "purpose": "Adicionar produto ou serviço ao carrinho do cliente e recalcular totais.",
+              "actor": "cliente",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "cartAggregate"
+              ],
+              "outputEntities": [
+                "cartAggregate"
+              ],
+              "readsTables": [
+                "cart"
+              ],
+              "writesTables": [
+                "cart"
+              ],
+              "commands": [
+                "addToCart"
+              ],
+              "rulesApplied": []
+            },
+            {
+              "usecaseId": "usecaseUpdateCart",
+              "title": "Atualizar carrinho",
+              "purpose": "Alterar quantidades ou remover itens do carrinho e atualizar totais.",
+              "actor": "cliente",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "cartAggregate"
+              ],
+              "outputEntities": [
+                "cartAggregate"
+              ],
+              "readsTables": [
+                "cart"
+              ],
+              "writesTables": [
+                "cart"
+              ],
+              "commands": [
+                "updateCart"
+              ],
+              "rulesApplied": []
+            },
+            {
+              "usecaseId": "usecaseCreateOrder",
+              "title": "Criar pedido",
+              "purpose": "Gerar pedido a partir do carrinho confirmado e marcar carrinho como convertido.",
+              "actor": "cliente",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "cartAggregate",
+                "orderAggregate"
+              ],
+              "outputEntities": [
+                "orderAggregate"
+              ],
+              "readsTables": [
+                "cart"
+              ],
+              "writesTables": [
+                "order",
+                "cart"
+              ],
+              "commands": [
+                "startCheckout"
+              ],
+              "rulesApplied": [
+                "ruleOrderRequiresCustomer"
+              ]
+            },
+            {
+              "usecaseId": "usecaseConfirmStripePayment",
+              "title": "Confirmar pagamento Stripe",
+              "purpose": "Atualizar status do pedido após confirmação de pagamento e registrar métricas.",
+              "actor": "cliente",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "orderAggregate",
+                "salesOpsMetricsAggregate"
+              ],
+              "outputEntities": [
+                "orderAggregate",
+                "salesOpsMetricsAggregate"
+              ],
+              "readsTables": [
+                "order"
+              ],
+              "writesTables": [
+                "order",
+                "salesOpsMetrics"
+              ],
+              "commands": [
+                "confirmStripePayment"
+              ],
+              "rulesApplied": [
+                "rulePaymentRequiredToConfirmOrder",
+                "ruleStripeTransactionLink",
+                "ruleMetricsUpdateOnOrderPaid"
+              ]
+            },
+            {
+              "usecaseId": "usecaseScheduleService",
+              "title": "Agendar serviço",
+              "purpose": "Criar agendamento de serviço e vincular ao pedido quando aplicável.",
+              "actor": "cliente",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "serviceBookingAggregate",
+                "orderAggregate"
+              ],
+              "outputEntities": [
+                "serviceBookingAggregate",
+                "orderAggregate"
+              ],
+              "readsTables": [
+                "order"
+              ],
+              "writesTables": [
+                "serviceBooking",
+                "order"
+              ],
+              "commands": [
+                "scheduleService"
+              ],
+              "rulesApplied": [
+                "ruleServiceBookingRequiresSlot"
+              ]
+            },
+            {
+              "usecaseId": "usecaseUpdateOrderStatus",
+              "title": "Atualizar status do pedido",
+              "purpose": "Alterar status do pedido conforme ciclo de vida e atualizar métricas quando necessário.",
+              "actor": "adminPetShop",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "orderAggregate",
+                "salesOpsMetricsAggregate"
+              ],
+              "outputEntities": [
+                "orderAggregate",
+                "salesOpsMetricsAggregate"
+              ],
+              "readsTables": [
+                "order"
+              ],
+              "writesTables": [
+                "order",
+                "salesOpsMetrics"
+              ],
+              "commands": [
+                "updateOrderStatus"
+              ],
+              "rulesApplied": [
+                "ruleOrderStatusLifecycle",
+                "ruleMetricsUpdateOnOrderPaid"
+              ]
+            },
+            {
+              "usecaseId": "usecaseGetOrderHistory",
+              "title": "Listar pedidos do cliente",
+              "purpose": "Listar pedidos do cliente para acompanhamento de histórico.",
+              "actor": "cliente",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "orderAggregate"
+              ],
+              "outputEntities": [
+                "orderAggregate"
+              ],
+              "readsTables": [
+                "order"
+              ],
+              "writesTables": [],
+              "rulesApplied": []
+            },
+            {
+              "usecaseId": "usecaseGetOrderAdminList",
+              "title": "Listar pedidos administrativos",
+              "purpose": "Listar pedidos por status e período para gestão administrativa.",
+              "actor": "adminPetShop",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "orderAggregate"
+              ],
+              "outputEntities": [
+                "orderAggregate"
+              ],
+              "readsTables": [
+                "order"
+              ],
+              "writesTables": [],
+              "rulesApplied": []
+            },
+            {
+              "usecaseId": "usecaseGetServiceBookings",
+              "title": "Listar agendamentos",
+              "purpose": "Consultar agendamentos por cliente, pet ou serviço.",
+              "actor": "adminPetShop",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "serviceBookingAggregate"
+              ],
+              "outputEntities": [
+                "serviceBookingAggregate"
+              ],
+              "readsTables": [
+                "serviceBooking"
+              ],
+              "writesTables": [],
+              "rulesApplied": []
+            },
+            {
+              "usecaseId": "usecaseGetMetricsDashboard",
+              "title": "Consultar métricas de vendas",
+              "purpose": "Obter séries temporais de métricas de vendas e pagamentos para dashboard.",
+              "actor": "adminPetShop",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "salesOpsMetricsAggregate"
+              ],
+              "outputEntities": [
+                "salesOpsMetricsAggregate"
+              ],
+              "readsTables": [
+                "salesOpsMetrics"
+              ],
+              "writesTables": [],
+              "rulesApplied": [
+                "ruleMetricsUpdateOnOrderPaid"
+              ]
+            },
+            {
+              "usecaseId": "usecaseUpdateMetricsOnOrderPaid",
+              "title": "Atualizar métricas de vendas",
+              "purpose": "Atualizar métricas operacionais quando pedidos são pagos ou cancelados.",
+              "actor": "adminPetShop",
+              "layer": "layer_3_usecases",
+              "inputEntities": [
+                "orderAggregate",
+                "salesOpsMetricsAggregate"
+              ],
+              "outputEntities": [
+                "salesOpsMetricsAggregate"
+              ],
+              "readsTables": [
+                "order"
+              ],
+              "writesTables": [
+                "salesOpsMetrics"
+              ],
+              "commands": [
+                "usecaseUpdateMetricsOnOrderPaid"
+              ],
+              "rulesApplied": [
+                "ruleMetricsUpdateOnOrderPaid"
+              ]
+            }
+          ],
+          "controllerRules": {
+            "bffMustCallUsecases": true,
+            "bffDirectTableAccessForbidden": true
+          }
+        },
+        "questions": [
+          "O agendamento deve permitir múltiplos pets por reserva ou sempre um único pet?",
+          "Deseja armazenar métricas agregadas separadas por janela (hora/dia/semana/mês) em tabelas adicionais ou manter apenas o time series bruto com agregações sob consulta?"
+        ],
+        "trace": [
+          "Definidos agregados de carrinho, pedido, agendamento e métricas com acesso exclusivo por layer_3_usecases.",
+          "Incluídos casos de uso para comandos de carrinho, checkout, pagamento, agendamento e atualização de status.",
+          "Incorporada atualização de métricas nos casos de uso que escrevem pedidos, conforme regra layer_3.",
+          "Criados casos de uso de consulta para carrinho, pedidos, agendamentos e dashboard de métricas."
+        ]
+      }
+    },
+    "status": "completed",
+    "stepId": 55,
+    "interaction": null,
+    "nextSteps": null
+  }
+}

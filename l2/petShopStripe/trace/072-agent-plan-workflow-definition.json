@@ -1,0 +1,168 @@
+{
+  "savedAt": "2026-06-08T12:33:12.909Z",
+  "agentName": "agentPlanWorkflowDefinition",
+  "stepId": 72,
+  "planning": null,
+  "status": "waiting_after_prompt",
+  "payload": {
+    "type": "flexible",
+    "result": {
+      "toolName": "submitWorkflowDefinitionPlan",
+      "arguments": {
+        "status": "ok",
+        "result": {
+          "workflowDefinition": {
+            "workflowId": "checkoutAndPayment",
+            "title": "Checkout e pagamento",
+            "purpose": "Fluxo de compra do cliente desde o carrinho até a confirmação de pagamento via Stripe, incluindo criação do pedido e atualização de métricas.",
+            "executionMode": "entityLifecycle",
+            "createsTask": false,
+            "taskConfig": {
+              "taskTitleTemplate": "",
+              "assigneeRules": [],
+              "slaRules": [],
+              "taskRoomRequired": false
+            },
+            "actors": [
+              "cliente"
+            ],
+            "states": [
+              {
+                "stateId": "cartReady",
+                "description": "Carrinho ativo com itens selecionados e pronto para iniciar checkout."
+              },
+              {
+                "stateId": "orderCreated",
+                "description": "Pedido criado e aguardando confirmação de pagamento."
+              },
+              {
+                "stateId": "orderPaid",
+                "description": "Pedido com pagamento confirmado e métricas atualizadas."
+              }
+            ],
+            "transitions": [
+              {
+                "from": "cartReady",
+                "to": "orderCreated",
+                "trigger": "startCheckout",
+                "actor": "cliente",
+                "conditions": [
+                  "cart.status == ativo",
+                  "ruleOrderRequiresCustomer"
+                ],
+                "actions": [
+                  "set cart.status = convertido",
+                  "set order.status = aguardandoPagamento",
+                  "set order.payment_status = pendente",
+                  "set order.created_at = now",
+                  "set order.updated_at = now"
+                ],
+                "rulesApplied": [
+                  "ruleOrderRequiresCustomer",
+                  "ruleOrderStatusLifecycle"
+                ]
+              },
+              {
+                "from": "orderCreated",
+                "to": "orderPaid",
+                "trigger": "confirmStripePayment",
+                "actor": "cliente",
+                "conditions": [
+                  "rulePaymentRequiredToConfirmOrder",
+                  "ruleStripeTransactionLink"
+                ],
+                "actions": [
+                  "set order.status = pago",
+                  "set order.payment_status = aprovado",
+                  "set order.paid_at = now",
+                  "set order.updated_at = now"
+                ],
+                "rulesApplied": [
+                  "rulePaymentRequiredToConfirmOrder",
+                  "ruleStripeTransactionLink",
+                  "ruleMetricsUpdateOnOrderPaid"
+                ]
+              }
+            ],
+            "requiredEntities": [
+              "Cart",
+              "CartItem",
+              "Order",
+              "OrderItem",
+              "Payment",
+              "StripeTransaction"
+            ],
+            "persistenceRefs": [
+              "cart",
+              "order"
+            ],
+            "usecaseRefs": [
+              "usecaseCreateOrder",
+              "usecaseConfirmStripePayment",
+              "usecaseUpdateMetricsOnOrderPaid"
+            ],
+            "metricRefs": [
+              "salesOpsMetrics"
+            ],
+            "userActions": [
+              "startCheckout",
+              "confirmStripePayment"
+            ],
+            "relatedPages": [
+              "cartPage",
+              "checkoutPage"
+            ],
+            "relatedAgents": [],
+            "relatedPlugins": [
+              "stripePaymentsPlugin"
+            ],
+            "rulesApplied": [
+              "ruleOrderRequiresCustomer",
+              "ruleOrderStatusLifecycle",
+              "rulePaymentRequiredToConfirmOrder",
+              "ruleStripeTransactionLink",
+              "ruleMetricsUpdateOnOrderPaid"
+            ],
+            "implementationSuggestions": [
+              {
+                "suggestionId": "suggestStripeWebhookHandler",
+                "title": "Processar confirmações de pagamento via webhook Stripe de forma assíncrona",
+                "priority": "now",
+                "description": "Garantir idempotência e confiabilidade na transição de status do pedido quando o Stripe confirmar o pagamento.",
+                "tradeoff": "Requer infraestrutura de filas e verificação de assinatura do webhook."
+              },
+              {
+                "suggestionId": "suggestCartExpirationJob",
+                "title": "Expirar carrinhos abandonados automaticamente após período de inatividade",
+                "priority": "soon",
+                "description": "Manter consistência de estoque e evitar carrinhos obsoletos antes do checkout.",
+                "tradeoff": "Pode encerrar carrinhos legítimos se o período for curto."
+              },
+              {
+                "suggestionId": "suggestNoTaskFlow",
+                "title": "Evitar criação de tarefas manuais no checkout",
+                "priority": "now",
+                "description": "Manter o fluxo 100% automatizado para o cliente sem geração de tarefas administrativas.",
+                "tradeoff": "Dependência maior de automações e monitoramento de falhas de pagamento."
+              }
+            ]
+          },
+          "defsPlan": {
+            "fileName": "workflows/checkoutAndPayment.defs.ts",
+            "exportName": "checkoutAndPaymentDef",
+            "saveAsDefs": true
+          }
+        },
+        "questions": [],
+        "trace": [
+          "Workflow planejado como entityLifecycle com transições focadas em criação do pedido e confirmação de pagamento.",
+          "Ações limitadas a campos de Cart e Order conforme tabelas moduleOwned."
+        ]
+      }
+    },
+    "status": "completed",
+    "stepId": 77,
+    "interaction": null,
+    "nextSteps": null
+  }
+}
