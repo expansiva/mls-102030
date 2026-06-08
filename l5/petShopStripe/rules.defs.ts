@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l5/petShopStripe/rules.defs.ts" enhancement="_blank" />
 export const rulesPlan = {
   "schemaVersion": "2026-06-06",
   "artifactType": "rules",

@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l2/petShopStripe/cartPage.defs.ts" enhancement="_blank" />
 export const cartPagePagePlan = {
   "schemaVersion": "2026-06-06",
   "artifactType": "page",

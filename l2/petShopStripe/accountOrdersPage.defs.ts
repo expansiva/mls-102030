@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l2/petShopStripe/accountOrdersPage.defs.ts" enhancement="_blank" />
 export const accountOrdersPagePagePlan = {
   "schemaVersion": "2026-06-06",
   "artifactType": "page",

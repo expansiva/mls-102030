@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l1/petShopStripe/layer_1_external/salesOpsMetrics.defs.ts" enhancement="_blank" />
 export const salesOpsMetricsMetricTableDefinition = {
   "schemaVersion": "2026-06-06",
   "artifactType": "metricTable",

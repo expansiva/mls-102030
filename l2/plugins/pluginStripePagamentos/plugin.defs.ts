@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l2/plugins/pluginStripePagamentos/plugin.defs.ts" enhancement="_blank" />
 export const pluginStripePagamentosPluginPlan = {
   "schemaVersion": "2026-06-06",
   "artifactType": "pluginDraft",

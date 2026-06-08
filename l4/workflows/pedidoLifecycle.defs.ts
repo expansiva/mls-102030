@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l4/workflows/pedidoLifecycle.defs.ts" enhancement="_blank" />
 export const pedidoLifecycleDef = {
   "schemaVersion": "2026-06-06",
   "artifactType": "workflow",

@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l1/petShopStripe/layer_3_usecases/usecaseUpdateMetricsOnOrderPaid.defs.ts" enhancement="_blank" />
 export const usecaseUpdateMetricsOnOrderPaidUsecasePlan = {
   "schemaVersion": "2026-06-06",
   "artifactType": "usecase",

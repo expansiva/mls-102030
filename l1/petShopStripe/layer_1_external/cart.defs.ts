@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l1/petShopStripe/layer_1_external/cart.defs.ts" enhancement="_blank" />
 export const cartTableDefinition = {
   "schemaVersion": "2026-06-06",
   "artifactType": "table",

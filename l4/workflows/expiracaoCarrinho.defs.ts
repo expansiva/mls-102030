@@ -1,3 +1,4 @@
+/// <mls fileReference="_102030_/l4/workflows/expiracaoCarrinho.defs.ts" enhancement="_blank" />
 export const expiracaoCarrinhoDef = {
   "schemaVersion": "2026-06-06",
   "artifactType": "workflow",
