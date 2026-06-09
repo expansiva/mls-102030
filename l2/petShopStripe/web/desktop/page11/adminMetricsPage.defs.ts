@@ -1,0 +1,12 @@
+/// <mls fileReference="_102030_/l2/petShopStripe/web/desktop/page11/adminMetricsPage.defs.ts"  enhancement="_blank"/>
+export const skill = `
+## Pages spec
+\`\`\`JSON
+{"pageId":"adminMetricsPage","pageName":"M\u00e9tricas","actor":"adminPetShop","purpose":"Exibir m\u00e9tricas de vendas e pagamentos em dashboard administrativo.","capabilities":["metricsDashboard"],"flowRefs":{"experienceFlows":[],"entityLifecycles":[],"taskWorkflows":[],"automations":[]},"pluginRefs":[],"mdmRefs":["organization"],"pageInputs":[{"name":"dateRange","type":"DateRange","required":false,"sources":["query","uiState"],"description":"Intervalo de datas para consulta das m\u00e9tricas."},{"name":"filterDimensions","type":"MetricsFilterDimensions","required":false,"sources":["query","uiState"],"description":"Dimens\u00f5es de filtro (status do pedido, status do pagamento, tipo de item)."}],"navigationRefs":[{"direction":"inbound","pageId":"adminDashboardPage","trigger":"Acessar m\u00e9tricas"}],"sections":[{"sectionName":"Filtros de m\u00e9tricas","mode":"filter","organisms":[{"organismName":"metricsFilters","purpose":"Selecionar per\u00edodo e dimens\u00f5es de filtro para atualizar o dashboard.","userActions":["Definir intervalo de datas","Selecionar status do pedido","Selecionar status do pagamento","Selecionar tipo de item","Aplicar filtros"],"requiredEntities":["salesOpsMetrics"],"readsFields":["event_time","order_status","payment_status","item_type"],"writesFields":[],"rulesApplied":["ruleMetricsUpdateOnOrderPaid"]}]},{"sectionName":"Dashboard de m\u00e9tricas","mode":"view","organisms":[{"organismName":"metricsCharts","purpose":"Exibir s\u00e9ries temporais e agrega\u00e7\u00f5es de receita, pedidos e pagamentos.","userActions":["Visualizar gr\u00e1ficos","Inspecionar m\u00e9tricas por per\u00edodo"],"requiredEntities":["salesOpsMetrics"],"readsFields":["event_time","order_total","order_count","approved_count","canceled_count","order_status","payment_status","item_type"],"writesFields":[],"rulesApplied":["ruleMetricsUpdateOnOrderPaid"]},{"organismName":"metricsSummaryCards","purpose":"Apresentar totais e indicadores resumidos do per\u00edodo selecionado.","userActions":["Visualizar indicadores","Comparar totais"],"requiredEntities":["salesOpsMetrics"],"readsFields":["order_total","order_count","approved_count","canceled_count"],"writesFields":[],"rulesApplied":["ruleMetricsUpdateOnOrderPaid"]}]}]}
+\`\`\`
+
+## Base Class
+\`\`\`JSON
+    [[(_102030_/l2/petShopStripe/web/shared/adminMetricsPage.ts)]]
+\`\`\`
+`;
