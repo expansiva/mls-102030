@@ -375,39 +375,3 @@ export const adminOrdersPagePagePlan = {
     ]
   }
 } ;
-
-export const materializeIndex = [
-  {
-    "id": "contract",
-    "agent": "agentL2MaterializeContract",
-    "defsPath": "_102030_/l1/petShopStripe/layer_2_controllers/adminOrdersPage.defs.ts",
-    "skillPath": "_102020_/l2/agentMaterializeSolution/skills/genContract.ts",
-    "moduleName": "petShopStripe",
-    "outputPath": "_102030_/l2/petShopStripe/web/contracts/adminOrdersPage.ts",
-    "dependsOn": [],
-    "specUpdatedAt": "2026-06-09T10:57:12Z"
-  },
-  {
-    "id": "shared",
-    "agent": "agentL2MaterializeSharedPage",
-    "defsPath": "_102030_/l2/petShopStripe/web/shared/adminOrdersPage.defs.ts",
-    "moduleName": "petShopStripe",
-    "outputPath": "adminOrdersPage.ts",
-    "dependsOn": [
-      "contract"
-    ],
-    "specUpdatedAt": "2026-06-09T10:57:12Z"
-  },
-  {
-    "id": "page",
-    "agent": "agentL2MaterializePageLit",
-    "defsPath": "_102030_/l2/petShopStripe/web/desktop/page11/adminOrdersPage.defs.ts",
-    "moduleName": "petShopStripe",
-    "outputPath": "adminOrdersPage.ts",
-    "dependsOn": [
-      "contract",
-      "shared"
-    ],
-    "specUpdatedAt": "2026-06-09T10:57:12Z"
-  }
-]
