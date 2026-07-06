@@ -49,16 +49,15 @@
       "type": "client",
       "persistenceModules": [
         {
-          "moduleId": "petshop",
-          "persistenceEntrypoint": "./_102030_/l1/petshop/persistence.js"
+          "moduleId": "petShopStripe",
+          "tableDefsDir": "./_102030_/l1/petShopStripe/layer_1_external"
         }
       ],
       "modules": [
         {
-          "moduleId": "petshop",
-          "basePath": "/petshop",
-          "shellMode": "spa",
-          "backendRouter": "./_102030_/l1/petshop/layer_2_controllers/router.js"
+          "moduleId": "petShopStripe",
+          "basePath": "/petShopStripe",
+          "shellMode": "spa"
         }
       ]
     },
