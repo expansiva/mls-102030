@@ -46,7 +46,7 @@
   "designSystems": {
     "1": {
       "name": "default",
-      "skill": "_102020_/l2/agentMaterializeSolution/skills/genPageDS.ts"
+      "skill": "_102020_/l2/agentImplementGenome/skills/genCfePageDesignSystem.ts"
     }
   }
 }
